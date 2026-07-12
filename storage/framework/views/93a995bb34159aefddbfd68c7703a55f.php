@@ -1,32 +1,42 @@
-<x-app-layout>
-    <x-slot name="header">
+<?php if (isset($component)) { $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54 = $attributes; } ?>
+<?php $component = App\View\Components\AppLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('app-layout'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\AppLayout::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+     <?php $__env->slot('header', null, []); ?> 
         <div class="max-w-6xl mx-auto">
             <p class="text-xs font-medium tracking-[0.2em] text-primary uppercase mb-1">Dashboard</p>
             <h2 class="font-bold text-xl text-text leading-tight">
-                {{ __('后台管理') }}
+                <?php echo e(__('后台管理')); ?>
+
             </h2>
         </div>
-    </x-slot>
+     <?php $__env->endSlot(); ?>
 
     <div class="py-12 bg-bg">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-            {{-- Welcome --}}
+            
             <div class="rounded-2xl border border-border bg-surface-2 p-6 sm:p-8">
                 <h1 class="text-2xl font-bold text-text">
-                    你好，{{ Auth::user()->name }} 👋
+                    你好，<?php echo e(Auth::user()->name); ?> 👋
                 </h1>
                 <p class="mt-2 text-text-secondary">
                     欢迎回到 Dashboard，从这里管理你的博客内容。
                 </p>
             </div>
 
-            {{-- Stats --}}
+            
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="rounded-2xl border border-border bg-surface-2 p-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm text-text-secondary">文章总数</p>
-                            <p class="text-3xl font-bold text-text mt-1">{{ $notesCount }}</p>
+                            <p class="text-3xl font-bold text-text mt-1"><?php echo e($notesCount); ?></p>
                         </div>
                         <span class="text-3xl">📝</span>
                     </div>
@@ -35,7 +45,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm text-text-secondary">分类数</p>
-                            <p class="text-3xl font-bold text-text mt-1">{{ $categoriesCount }}</p>
+                            <p class="text-3xl font-bold text-text mt-1"><?php echo e($categoriesCount); ?></p>
                         </div>
                         <span class="text-3xl">📁</span>
                     </div>
@@ -44,36 +54,36 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm text-text-secondary">标签数</p>
-                            <p class="text-3xl font-bold text-text mt-1">{{ $tagsCount }}</p>
+                            <p class="text-3xl font-bold text-text mt-1"><?php echo e($tagsCount); ?></p>
                         </div>
                         <span class="text-3xl">🏷️</span>
                     </div>
                 </div>
             </div>
 
-            {{-- Quick Actions --}}
+            
             <div class="rounded-2xl border border-border bg-surface-2 p-6 sm:p-8">
                 <p class="text-xs font-medium tracking-[0.2em] text-primary uppercase mb-4">快捷操作</p>
                 <div class="flex flex-wrap gap-3">
-                    <a href="{{ route('notes.create') }}"
+                    <a href="<?php echo e(route('notes.create')); ?>"
                         class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-primary-hover hover:shadow-md hover:-translate-y-px active:translate-y-0 active:scale-[0.98]">
                         ✍️ 写文章
                     </a>
-                    <a href="{{ route('profile.edit') }}"
+                    <a href="<?php echo e(route('profile.edit')); ?>"
                         class="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-5 py-2.5 text-sm font-medium text-text transition-all duration-200 hover:bg-white hover:border-border-strong hover:-translate-y-px">
                         ⚙️ 个人资料
                     </a>
-                    <a href="{{ route('home') }}"
+                    <a href="<?php echo e(route('home')); ?>"
                         class="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-5 py-2.5 text-sm font-medium text-text transition-all duration-200 hover:bg-white hover:border-border-strong hover:-translate-y-px">
                         🏠 查看博客
                     </a>
                 </div>
             </div>
 
-            {{-- 站点设置：Hero 背景图 --}}
-            <div class="rounded-2xl border border-border bg-surface-2 p-5 sm:p-6" x-data="heroImageManager({{ Illuminate\Support\Js::from($heroImage) }})">
+            
+            <div class="rounded-2xl border border-border bg-surface-2 p-5 sm:p-6" x-data="heroImageManager(<?php echo e(Illuminate\Support\Js::from($heroImage)); ?>)">
                 <div class="flex items-center gap-4">
-                    {{-- 缩略预览 --}}
+                    
                     <div class="relative w-28 h-16 rounded-lg overflow-hidden border border-border shrink-0 bg-surface-2">
                         <template x-if="currentUrl">
                             <img :src="currentUrl" alt="Hero 背景图" class="w-full h-full object-cover">
@@ -85,7 +95,7 @@
                         </template>
                     </div>
 
-                    {{-- 信息 + 操作（紧凑一行） --}}
+                    
                     <div class="flex-1 min-w-0 flex items-center gap-3">
                         <div class="min-w-0">
                             <p class="text-sm font-medium text-text truncate">首页 Hero 背景图</p>
@@ -111,7 +121,7 @@
                         </div>
                     </div>
                 </div>
-                {{-- 提示消息 --}}
+                
                 <template x-if="error">
                     <p class="text-xs text-red-600 mt-2" x-text="error"></p>
                 </template>
@@ -120,8 +130,8 @@
                 </template>
             </div>
 
-            {{-- 站点设置：About 页面内容（Markdown 编辑器） --}}
-            <div class="rounded-2xl border border-border bg-surface-2 p-5 sm:p-6" x-data="aboutMarkdownEditor({{ Illuminate\Support\Js::from($aboutMarkdown) }})">
+            
+            <div class="rounded-2xl border border-border bg-surface-2 p-5 sm:p-6" x-data="aboutMarkdownEditor(<?php echo e(Illuminate\Support\Js::from($aboutMarkdown)); ?>)">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <p class="text-sm font-medium text-text">About 页面内容</p>
@@ -133,14 +143,14 @@
                             <button type="button" :class="{ 'active': viewMode === 'split' }" @click="setViewMode('split')">分屏</button>
                             <button type="button" :class="{ 'active': viewMode === 'preview' }" @click="setViewMode('preview')">预览</button>
                         </div>
-                        <a href="{{ route('about') }}" target="_blank" class="text-xs text-primary hover:text-primary-hover transition flex items-center gap-1 shrink-0">
+                        <a href="<?php echo e(route('about')); ?>" target="_blank" class="text-xs text-primary hover:text-primary-hover transition flex items-center gap-1 shrink-0">
                             预览页面
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                         </a>
                     </div>
                 </div>
 
-                {{-- 工具栏 --}}
+                
                 <div class="md-toolbar mb-3" role="toolbar" aria-label="Markdown 工具栏">
                     <div class="md-toolbar-group">
                         <button type="button" class="md-btn md-text" title="粗体" @click="wrapSelection('**', '**', '粗体文字')"><b>B</b></button>
@@ -182,7 +192,7 @@
                     </div>
                 </div>
 
-                {{-- 编辑区 + 预览 --}}
+                
                 <div class="editor-body" :class="viewMode">
                     <textarea x-ref="mdTextarea"
                         class="editor-textarea min-h-[400px]"
@@ -192,7 +202,7 @@
                     <div class="md-preview article-content" x-show="viewMode !== 'edit'" x-cloak x-html="previewHtml"></div>
                 </div>
 
-                {{-- 底部状态栏 --}}
+                
                 <div class="flex items-center justify-between mt-3 pt-3 border-t border-border">
                     <span class="text-[11px] text-text-muted" x-text="'约 ' + charCount + ' 字'"></span>
                     <div class="flex items-center gap-3">
@@ -209,66 +219,68 @@
                 </div>
             </div>
 
-            {{-- Recent Notes --}}
+            
             <div class="rounded-2xl border border-border bg-surface-2 p-6 sm:p-8" x-data="coverManager()" x-cloak>
                 <p class="text-xs font-medium tracking-[0.2em] text-primary uppercase mb-4">最近文章</p>
 
-                @if ($notes->isNotEmpty())
+                <?php if($notes->isNotEmpty()): ?>
                     <div class="space-y-3">
-                        @foreach ($notes as $note)
+                        <?php $__currentLoopData = $notes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $note): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="flex items-center justify-between p-3 rounded-xl bg-surface border border-border hover:border-border-strong transition">
                                 <div class="flex items-center gap-3 flex-1 min-w-0">
-                                    {{-- 封面缩略图（有封面显示 img，无封面显示占位，互斥） --}}
-                                    <img src="{{ $note->cover_image_url ?? '' }}"
+                                    
+                                    <img src="<?php echo e($note->cover_image_url ?? ''); ?>"
                                          alt="封面"
-                                         data-cover-thumb="{{ $note->id }}"
-                                         class="w-12 h-12 rounded-lg object-cover shrink-0 border border-border {{ $note->cover_image_url ? '' : 'hidden' }}">
-                                    <div data-cover-placeholder="{{ $note->id }}"
-                                         class="w-12 h-12 rounded-lg bg-surface-2 border border-border flex items-center justify-center shrink-0 text-text-muted text-xs {{ $note->cover_image_url ? 'hidden' : '' }}">
+                                         data-cover-thumb="<?php echo e($note->id); ?>"
+                                         class="w-12 h-12 rounded-lg object-cover shrink-0 border border-border <?php echo e($note->cover_image_url ? '' : 'hidden'); ?>">
+                                    <div data-cover-placeholder="<?php echo e($note->id); ?>"
+                                         class="w-12 h-12 rounded-lg bg-surface-2 border border-border flex items-center justify-center shrink-0 text-text-muted text-xs <?php echo e($note->cover_image_url ? 'hidden' : ''); ?>">
                                         无
                                     </div>
 
                                     <div class="flex-1 min-w-0">
                                         <div class="flex items-center gap-2">
-                                            <a href="{{ route('notes.show', $note) }}"
+                                            <a href="<?php echo e(route('notes.show', $note)); ?>"
                                                 class="text-sm font-medium text-text hover:text-primary transition truncate">
-                                                {{ \Illuminate\Support\Str::limit($note->title, 40) }}
+                                                <?php echo e(\Illuminate\Support\Str::limit($note->title, 40)); ?>
+
                                             </a>
-                                            @if ($note->isDraft())
+                                            <?php if($note->isDraft()): ?>
                                                 <span class="shrink-0 rounded-full bg-gold-light px-2 py-0.5 text-xs font-medium text-gold-hover">草稿</span>
-                                            @endif
+                                            <?php endif; ?>
                                         </div>
                                         <p class="text-xs text-text-secondary mt-0.5">
-                                            {{ $note->created_at->format('Y-m-d') }}
+                                            <?php echo e($note->created_at->format('Y-m-d')); ?>
+
                                         </p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3 ml-4">
                                     <button type="button"
-                                        data-note-id="{{ $note->id }}"
-                                        data-note-title="{{ $note->title }}"
-                                        data-cover-url="{{ $note->cover_image_url ?? '' }}"
+                                        data-note-id="<?php echo e($note->id); ?>"
+                                        data-note-title="<?php echo e($note->title); ?>"
+                                        data-cover-url="<?php echo e($note->cover_image_url ?? ''); ?>"
                                         class="text-xs text-primary hover:text-primary-hover transition"
                                         @click="openModal($event.currentTarget)">换封面</button>
-                                    <a href="{{ route('notes.edit', $note) }}"
+                                    <a href="<?php echo e(route('notes.edit', $note)); ?>"
                                         class="text-xs text-primary hover:text-primary-hover transition">编辑</a>
-                                    <form action="{{ route('notes.destroy', $note) }}" method="POST" class="inline">
-                                        @csrf
-                                        @method('DELETE')
+                                    <form action="<?php echo e(route('notes.destroy', $note)); ?>" method="POST" class="inline">
+                                        <?php echo csrf_field(); ?>
+                                        <?php echo method_field('DELETE'); ?>
                                         <button type="submit" class="text-xs text-red-600 hover:text-red-700 transition"
                                             onclick="return confirm('确定要删除这篇文章吗？')">删除</button>
                                     </form>
                                 </div>
                             </div>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
-                @else
+                <?php else: ?>
                     <p class="text-sm text-text-secondary text-center py-6">
-                        还没有文章，<a href="{{ route('notes.create') }}" class="text-primary hover:text-primary-hover">去写一篇吧</a>
+                        还没有文章，<a href="<?php echo e(route('notes.create')); ?>" class="text-primary hover:text-primary-hover">去写一篇吧</a>
                     </p>
-                @endif
+                <?php endif; ?>
 
-                {{-- 更换封面弹窗 --}}
+                
                 <div x-show="modalOpen" x-cloak
                      class="fixed inset-0 z-50 flex items-center justify-center p-4"
                      x-transition.opacity>
@@ -277,7 +289,7 @@
                         <h3 class="font-bold text-lg text-text mb-1">更换封面</h3>
                         <p class="text-sm text-text-secondary mb-4 truncate" x-text="currentTitle"></p>
 
-                        {{-- 预览 --}}
+                        
                         <div class="mb-4">
                             <template x-if="preview">
                                 <img :src="preview" class="w-full h-40 object-cover rounded-xl border border-border">
@@ -289,7 +301,7 @@
                             </template>
                         </div>
 
-                        {{-- 选择文件 --}}
+                        
                         <input type="file" accept="image/*" class="hidden" x-ref="coverFile"
                                @change="onFileChange($event)">
                         <button type="button"
@@ -322,13 +334,14 @@
                 </div>
             </div>
 
-            {{-- Flash --}}
-            @if (session('success'))
+            
+            <?php if(session('success')): ?>
                 <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)"
                     class="fixed bottom-6 right-6 rounded-xl bg-primary px-6 py-3 text-sm font-medium text-white shadow-md">
-                    {{ session('success') }}
+                    <?php echo e(session('success')); ?>
+
                 </div>
-            @endif
+            <?php endif; ?>
         </div>
     </div>
 
@@ -754,7 +767,17 @@
         };
     </script>
 
-    @push('scripts')
-        @vite(['resources/js/editor.js'])
-    @endpush
-</x-app-layout>
+    <?php $__env->startPush('scripts'); ?>
+        <?php echo app('Illuminate\Foundation\Vite')(['resources/js/editor.js']); ?>
+    <?php $__env->stopPush(); ?>
+ <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $attributes = $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $component = $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
+<?php endif; ?>
+<?php /**PATH /Volumes/T7/Project/blog/resources/views/dashboard.blade.php ENDPATH**/ ?>

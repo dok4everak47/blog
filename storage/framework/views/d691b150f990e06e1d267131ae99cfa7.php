@@ -79,6 +79,8 @@
 <?php $component = $__componentOriginal8a8716efb3c62a45938aca52e78e0322; ?>
 <?php unset($__componentOriginal8a8716efb3c62a45938aca52e78e0322); ?>
 <?php endif; ?>
+
+        <?php echo $__env->yieldPushContent('scripts'); ?>
     </body>
 </html>
 <?php /**PATH /Volumes/T7/Project/blog/resources/views/layouts/app.blade.php ENDPATH**/ ?>
