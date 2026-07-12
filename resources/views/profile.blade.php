@@ -30,7 +30,7 @@
 
       {{-- Markdown 渲染内容 --}}
       @if($html)
-      <article class="about-content text-[15px] leading-[1.85] text-text-secondary prose-custom">
+      <article class="about-content text-[15px] leading-[1.85] text-text prose-custom">
         {!! $html !!}
       </article>
       @else
