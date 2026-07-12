@@ -37,9 +37,6 @@
       <p class="text-text-muted italic py-8">暂无内容…</p>
       <?php endif; ?>
 
-      
-      <hr class="border-dashed border-border my-10">
-
      
       <aside class="rounded-lg border-l-[3px] border-primary bg-surface-2/60 p-5 sm:p-6 mb-10">
         <p class="text-sm leading-relaxed mb-2">
