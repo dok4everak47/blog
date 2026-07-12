@@ -1,9 +1,9 @@
 <section class="space-y-6">
     <header>
-        <h2 class="text-lg font-medium text-text">
+        <p class="text-xs font-medium tracking-[0.2em] text-red-500 uppercase mb-1">Danger Zone</p>
+        <h2 class="text-lg font-bold text-text">
             {{ __('删除账户') }}
         </h2>
-
         <p class="mt-1 text-sm text-text-secondary">
             {{ __('账户删除后，所有数据和资源将被永久删除。删除前请备份你需要保留的信息。') }}
         </p>
@@ -19,7 +19,7 @@
             @csrf
             @method('delete')
 
-            <h2 class="text-lg font-medium text-text">
+            <h2 class="text-lg font-bold text-text">
                 {{ __('确定要删除账户吗？') }}
             </h2>
 
@@ -34,7 +34,7 @@
                     id="password"
                     name="password"
                     type="password"
-                    class="mt-1 block w-3/4"
+                    class="w-3/4"
                     placeholder="{{ __('密码') }}"
                 />
 
