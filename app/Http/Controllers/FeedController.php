@@ -11,17 +11,18 @@ class FeedController extends Controller
 {
     /**
      * RSS 2.0 Feed — 最新 20 篇已发布文章
+     *
+     * 不缓存 Eloquent Collection（database 驱动序列化会产生 __PHP_Incomplete_Class）。
+     * RSS 本身可由 CDN/代理层缓存，或后续换 Redis 后再加 Cache::remember。
      */
     public function rss(): Response
     {
-        $notes = Cache::remember('feed.rss', 1800, function () {
-            return Note::query()
-                ->published()
-                ->with('category', 'tags')
-                ->latest('published_at')
-                ->limit(20)
-                ->get();
-        });
+        $notes = Note::query()
+            ->published()
+            ->with('category', 'tags')
+            ->latest('updated_at')
+            ->limit(20)
+            ->get();
 
         $xml = view('feeds.rss', compact('notes'))->render();
 
@@ -31,10 +32,12 @@ class FeedController extends Controller
 
     /**
      * Sitemap XML — 所有已发布文章 + 首页
+     *
+     * 此处缓存安全：存的是渲染后的 XML 字符串，非 Eloquent 对象。
      */
     public function sitemap(): Response
     {
-        $xml = Cache::remember('feed.sitemap', 3600, function () {
+        $xml = Cache::remember('feed.sitemap', 86400, function () {
             // 首页（最高优先级）
             $urls = collect([[
                 'loc' => URL::route('home'),
@@ -43,7 +46,7 @@ class FeedController extends Controller
                 'priority' => '1.0',
             ]]);
 
-            // 所有已发布文章
+            // 所有已发布文章（只查需要字段，不加载关联）
             Note::query()
                 ->published()
                 ->select(['id', 'slug', 'updated_at', 'created_at'])
