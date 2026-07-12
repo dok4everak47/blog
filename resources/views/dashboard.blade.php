@@ -99,7 +99,7 @@
                                     class="px-3 py-1.5 rounded-lg bg-primary text-xs font-medium text-white hover:bg-primary-hover transition disabled:opacity-50 whitespace-nowrap"
                                     :disabled="uploading"
                                     @click="$refs.heroFile.click()">
-                                <span x-show="!uploading">更换</span>
+                                <span x-show="!uploading">上传</span>
                                 <span x-show="uploading" x-cloak>上传中…</span>
                             </button>
                             <button type="button"
