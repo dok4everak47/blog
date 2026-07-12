@@ -14,7 +14,7 @@ class CommentPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasVerifiedEmail() ?? true;
+        return true;
     }
 
     public function delete(User $user, Comment $comment): bool
