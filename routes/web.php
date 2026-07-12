@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FeedController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TagController;
@@ -18,6 +19,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
+
+// RSS Feed + Sitemap（公开）
+Route::get('/feed.xml', [FeedController::class, 'rss'])->name('feed.rss');
+Route::get('/sitemap.xml', [FeedController::class, 'sitemap'])->name('feed.sitemap');
 
 // 文章列表（公开）
 Route::get('/notes', [NoteController::class, 'index'])->name('notes.index');
