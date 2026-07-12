@@ -369,6 +369,8 @@
                     this.error = null;
                     this.success = null;
                     const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
+                    const fd = new FormData();
+                    fd.append('remove', '1');
                     try {
                         const res = await fetch('/settings/hero-image', {
                             method: 'POST',
@@ -377,9 +379,13 @@
                                 'Accept': 'application/json',
                                 'X-Requested-With': 'XMLHttpRequest',
                             },
-                            body: JSON.stringify({ remove: true }),
+                            body: fd,
                         });
-                        if (!res.ok) throw new Error();
+                        if (!res.ok) {
+                            const data = await res.json().catch(() => ({}));
+                            this.error = data.message || '移除失败，请重试';
+                            return;
+                        }
                         this.currentUrl = null;
                         this.success = '已移除';
                         setTimeout(() => { this.success = null; }, 3000);
