@@ -71,7 +71,7 @@
             </div>
 
             {{-- 站点设置：Hero 背景图 --}}
-            <div class="rounded-2xl border border-border bg-white p-5 sm:p-6" x-data="heroImageManager({{ Illuminate\Support\Js::from($heroImage) }}">
+            <div class="rounded-2xl border border-border bg-white p-5 sm:p-6" x-data="heroImageManager({{ Illuminate\Support\Js::from($heroImage) }})">
                 <div class="flex items-center gap-4">
                     {{-- 缩略预览 --}}
                     <div class="relative w-28 h-16 rounded-lg overflow-hidden border border-border shrink-0 bg-surface-2">
