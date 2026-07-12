@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Comment;
+use App\Models\Note;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class CommentController extends Controller
+{
+    /**
+     * 发布评论（或回复）
+     */
+    public function store(Request $request, Note $note): RedirectResponse
+    {
+        // 草稿不允许评论
+        if ($note->isDraft()) {
+            abort(404);
+        }
+
+        $request->validate([
+            'content' => 'required|string|max:2000',
+            'parent_id' => 'nullable|exists:comments,id',
+        ]);
+
+        $comment = new Comment($request->only('content', 'parent_id'));
+        $comment->note_id = $note->id;
+        $comment->user_id = Auth::id();
+        $comment->save();
+
+        return back()->with('success', '评论已发布');
+    }
+
+    /**
+     * 删除评论（仅作者可删）
+     */
+    public function destroy(Comment $comment): RedirectResponse
+    {
+        $this->authorize('delete', $comment);
+        $comment->delete();
+        return back()->with('success', '评论已删除');
+    }
+}

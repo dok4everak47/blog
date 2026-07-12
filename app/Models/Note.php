@@ -81,13 +81,18 @@ class Note extends Model
 
     /**
      * 作者（多作者/权限隔离的基础）。
-     * 注意：user_id 不进入 $fillable，只能由控制器通过
-     * auth()->user()->notes()->create() 赋值，杜绝表单伪造归属。
      */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class)->whereNull('parent_id')->oldest();
+    }
+
+    /**
 
     /**
      * 封面图公开访问地址（存储于 storage/app/public/covers）。
