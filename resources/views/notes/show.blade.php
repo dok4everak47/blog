@@ -83,20 +83,22 @@ $readTime = max(1, (int) ceil($charCount / 300));
       </div>
     </article>
 
-    {{-- ====== 右侧目录导航 ====== --}}
-    <aside class="hidden lg:block w-52 shrink-0">
-      <div class="sticky top-24">
-        <p class="text-xs font-medium tracking-[0.15em] text-text-muted uppercase mb-4">目录</p>
-        <nav id="article-toc" class="space-y-1">
-          {{-- 由 JS 动态生成 --}}
-        </nav>
-      </div>
-    </aside>
+      </div>{{-- 左侧文章主体结束 --}}
 
-  </div>
+      {{-- ====== 右侧目录导航 ====== --}}
+      <aside class="hidden lg:block w-52 shrink-0">
+        <div class="sticky top-24">
+          <p class="text-xs font-medium tracking-[0.15em] text-text-muted uppercase mb-4">目录</p>
+          <nav id="article-toc" class="space-y-1">
+            {{-- 由 JS 动态生成 --}}
+          </nav>
+        </div>
+      </aside>
 
-  {{-- 以下区域仍在左侧视觉流中（flex 布局下 aside 占位后自然换行） --}}
-  <div class="-mt-10 max-w-none lg:max-w-[780px]">
+    </div>{{-- flex row 结束 --}}
+
+    {{-- 以下区域全宽（标签 + 评论 + 导航） --}}
+    <div class="mt-10">
 
     @if ($note->tags->isNotEmpty())
       <div class="mt-8 flex flex-wrap gap-2">
