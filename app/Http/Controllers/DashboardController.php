@@ -65,7 +65,8 @@ class DashboardController extends Controller
      *
      * 注意：web 路由的 validate() 默认返回 302 重定向而非 JSON，
      * 所以手动 Validator::make + 显式 response()->json()，确保前端 fetch 能拿到错误。
-     * max:2048 对齐 PHP upload_max_filesize（默认 2M），避免 PHP 静默拦截大文件。
+     * max:20480 对齐 PHP upload_max_filesize（10M），设置为 20M 覆盖高清大图场景。
+     * 如果 PHP 层面限制更小（如 2M），需要在 php.ini 中调大 upload_max_filesize 和 post_max_size。
      */
     public function updateHeroImage(Request $request): JsonResponse
     {
@@ -81,12 +82,12 @@ class DashboardController extends Controller
 
         // 手动校验（web 路由必须显式返回 JSON 422，否则 validate() 返回 302）
         $validator = Validator::make($request->all(), [
-            'image' => 'required|image|mimes:jpeg,png,jpg,webp,gif|max:10240',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp,gif|max:20480',
         ], [
             'image.required' => '请选择图片文件',
             'image.image'   => '文件必须是有效图片',
             'image.mimes'  => '仅支持 JPEG、PNG、WebP、GIF 格式',
-            'image.max'    => '图片大小不能超过 10MB',
+            'image.max'    => '图片大小不能超过 20MB',
         ]);
 
         if ($validator->fails()) {
