@@ -15,9 +15,9 @@
     {{-- 文章列表 --}}
     @forelse ($notes as $note)
       <article class="group rounded-2xl border border-border bg-surface overflow-hidden hover:border-border-strong hover:shadow-md transition-all duration-300 mb-6">
-        <a href="{{ route('notes.show', $note) }}" class="grid grid-cols-1 sm:grid-cols-[3fr_2fr]">
+        <div onclick="window.location.href='{{ route('notes.show', $note) }}'" class="grid grid-cols-1 sm:grid-cols-5 cursor-pointer" role="link" tabindex="0">
           {{-- 左侧：文字信息 --}}
-          <div class="p-6 sm:p-8 flex flex-col justify-center">
+          <div class="p-6 sm:p-8 sm:col-span-3 flex flex-col justify-center">
             {{-- 日期 --}}
             <div class="flex items-center gap-2 text-xs text-text-muted mb-3">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -84,7 +84,7 @@
             }
           @endphp
 
-          <div class="min-h-[200px] sm:min-h-auto relative overflow-hidden bg-surface-2">
+          <div class="min-h-[200px] sm:min-h-auto sm:col-span-2 relative overflow-hidden bg-surface-2">
             @if ($displayImage)
               <img src="{{ $displayImage }}" alt="{{ $note->title }}"
                    loading="lazy"
@@ -103,7 +103,7 @@
               </div>
             @endif
           </div>
-        </a>
+        </div>
       </article>
     @empty
       <div class="rounded-2xl border border-dashed border-border p-16 text-center bg-surface-2">

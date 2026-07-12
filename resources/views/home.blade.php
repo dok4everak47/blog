@@ -70,7 +70,7 @@
         @forelse ($notes as $note)
           <article
             class="group rounded-2xl border border-border bg-surface-2 overflow-hidden hover:border-border-strong transition-all duration-300">
-            <a href="{{ route('notes.show', $note) }}" class="grid grid-cols-1 md:grid-cols-5">
+            <div onclick="window.location.href='{{ route('notes.show', $note) }}'" class="grid grid-cols-1 md:grid-cols-5 cursor-pointer" role="link">
               {{-- Text --}}
               <div class="p-6 sm:p-8 md:col-span-3 flex flex-col justify-center">
                 <div class="flex items-center gap-2 text-xs text-text-muted mb-3">
@@ -131,7 +131,7 @@
                   </div>
                 @endif
               </div>
-            </a>
+            </div>
           </article>
         @empty
           <div class="rounded-2xl border border-dashed border-border p-16 text-center bg-surface-2">
