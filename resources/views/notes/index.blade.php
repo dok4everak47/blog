@@ -15,9 +15,9 @@
     {{-- 文章列表 --}}
     @forelse ($notes as $note)
       <article class="group rounded-2xl border border-border bg-surface overflow-hidden hover:border-border-strong hover:shadow-md transition-all duration-300 mb-6">
-        <a href="{{ route('notes.show', $note) }}" class="block md:flex">
+        <a href="{{ route('notes.show', $note) }}" class="grid grid-cols-1 sm:grid-cols-[3fr_2fr]">
           {{-- 左侧：文字信息 --}}
-          <div class="p-6 sm:p-8 md:w-3/5 flex flex-col justify-center min-h-[200px]">
+          <div class="p-6 sm:p-8 flex flex-col justify-center">
             {{-- 日期 --}}
             <div class="flex items-center gap-2 text-xs text-text-muted mb-3">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,7 +74,7 @@
           </div>
 
           {{-- 右侧：封面图 --}}
-          <div class="md:w-2/5 min-h-[180px] md:min-h-[220px] relative overflow-hidden bg-surface-2">
+          <div class="min-h-[200px] sm:min-h-auto relative overflow-hidden bg-surface-2">
             @if ($note->cover_image_url)
               <img src="{{ $note->cover_image_url }}" alt="{{ $note->title }}"
                    loading="lazy"
