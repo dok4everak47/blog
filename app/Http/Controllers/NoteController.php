@@ -85,7 +85,7 @@ class NoteController extends Controller
         // Policy 双重校验：已发布→放行，草稿→仅作者（含 403/404）
         $this->authorize('view', $note);
 
-        $note->load('tags', 'category', 'comments.replies');
+        $note->load('tags', 'category', 'comments.user', 'comments.replies.user');
 
         // 上一篇 / 下一篇（仅已发布）
         $previous = Note::published()->where('id', '<', $note->id)->latest('id')->first();

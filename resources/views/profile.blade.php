@@ -11,7 +11,10 @@
 @section('content')
 @php
     $markdown = \App\Models\SiteSetting::get('about_markdown', '');
-    $html = $markdown ? \Illuminate\Support\Str::markdown($markdown) : '';
+    $html = $markdown ? \Illuminate\Support\Str::markdown($markdown, [
+        'html_input' => 'strip',
+        'allow_unsafe_links' => false,
+    ]) : '';
 @endphp
 
 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">

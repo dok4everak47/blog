@@ -1,2 +1,13 @@
 User-agent: *
-Disallow:
+Disallow: /dashboard
+Disallow: /login
+Disallow: /register
+Disallow: /profile
+Disallow: /settings
+Disallow: /notes/create
+Disallow: /notes/*/edit
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /verify-email
+
+Sitemap: /sitemap.xml

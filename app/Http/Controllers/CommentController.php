@@ -20,6 +20,8 @@ class CommentController extends Controller
             abort(404);
         }
 
+        $this->authorize('create', Comment::class);
+
         $request->validate([
             'content' => 'required|string|max:2000',
             'parent_id' => 'nullable|exists:comments,id',

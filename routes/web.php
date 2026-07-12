@@ -55,17 +55,23 @@ Route::middleware('auth')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // 首页 Hero 背景图设置
-    Route::post('/settings/hero-image', [DashboardController::class, 'updateHeroImage'])
-        ->middleware('throttle:30,1')
-        ->name('settings.hero-image');
+    // 站点全局设置（仅管理员）
+    Route::middleware('admin')->group(function () {
+        // 首页 Hero 背景图设置
+        Route::post('/settings/hero-image', [DashboardController::class, 'updateHeroImage'])
+            ->middleware('throttle:30,1')
+            ->name('settings.hero-image');
 
-    // About 页面内容编辑
-    Route::get('/settings/about-content', [DashboardController::class, 'getAboutContent'])
-        ->name('settings.about-content.get');
-    Route::post('/settings/about-content', [DashboardController::class, 'updateAboutContent'])
-        ->middleware('throttle:30,1')
-        ->name('settings.about-content.update');
+        // About 页面内容编辑
+        Route::get('/settings/about-content', [DashboardController::class, 'getAboutContent'])
+            ->name('settings.about-content.get');
+        Route::post('/settings/about-content', [DashboardController::class, 'updateAboutContent'])
+            ->middleware('throttle:30,1')
+            ->name('settings.about-content.update');
+
+        // 编辑器内联快速创建分类
+        Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+    });
 
     // 文章管理
     Route::get('/notes/create', [NoteController::class, 'create'])->name('notes.create');
@@ -89,16 +95,15 @@ Route::middleware('auth')->group(function () {
         ->middleware('throttle:30,1')
         ->name('notes.upload-image');
 
-    // 编辑器内联快速创建分类
-    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
-
     // 个人资料
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // 评论（需登录）
-    Route::post('/notes/{note}/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::post('/notes/{note}/comments', [CommentController::class, 'store'])
+        ->middleware('throttle:10,1')
+        ->name('comments.store');
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 });
 
