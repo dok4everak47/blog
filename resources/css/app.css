@@ -261,6 +261,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-top: 0;
+    /* 让内容区在导航栏下方 */
 }
 
 /* 背景图层 */
@@ -297,9 +299,12 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     text-align: center;
-    padding: 80px 24px;
+    padding: 24px;
     max-width: 800px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* 大标题 */
@@ -317,12 +322,15 @@ body {
 .hero-quote {
     display: flex;
     align-items: flex-start;
+    justify-content: center;
     gap: 0.5rem;
     margin-bottom: 2rem;
     max-width: 600px;
+    width: auto;
 }
 .hero-quote-icon {
-    font-size: 1.25rem;
+    width: 20px;
+    height: 20px;
     color: rgba(255, 255, 255, 0.5);
     flex-shrink: 0;
     margin-top: 0.15rem;

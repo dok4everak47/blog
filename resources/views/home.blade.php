@@ -188,10 +188,18 @@
                 </div>
               </div>
 
-              {{-- Cover Image / Placeholder --}}
+              {{-- Cover Image / 内容首图 --}}
+              @php
+                $homeDisplayImage = $note->cover_image_url;
+                if (!$homeDisplayImage && $note->content) {
+                  if (preg_match('/!\[.*?\]\(([^)]+)\)/', $note->content, $hm)) {
+                    $homeDisplayImage = $hm[1];
+                  }
+                }
+              @endphp
               <div class="md:col-span-2 min-h-[180px] md:min-h-full relative overflow-hidden">
-                @if ($note->cover_image_url)
-                  <img src="{{ $note->cover_image_url }}" alt="{{ $note->title }}"
+                @if ($homeDisplayImage)
+                  <img src="{{ $homeDisplayImage }}" alt="{{ $note->title }}"
                     class="absolute inset-0 w-full h-full object-cover">
                 @else
                   <div
