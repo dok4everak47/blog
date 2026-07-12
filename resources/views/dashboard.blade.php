@@ -71,51 +71,53 @@
             </div>
 
             {{-- 站点设置：Hero 背景图 --}}
-            <div class="rounded-2xl border border-border bg-white p-6 sm:p-8" x-data="heroImageManager({{ Illuminate\Support\Js::from($heroImage) }})">
-                <p class="text-xs font-medium tracking-[0.2em] text-primary uppercase mb-4">站点设置</p>
-                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    {{-- 当前 Hero 背景图预览 --}}
-                    <div class="relative w-full sm:w-48 h-28 rounded-xl overflow-hidden border border-border shrink-0 bg-surface-2">
+            <div class="rounded-2xl border border-border bg-white p-5 sm:p-6" x-data="heroImageManager({{ Illuminate\Support\Js::from($heroImage) }}">
+                <div class="flex items-center gap-4">
+                    {{-- 缩略预览 --}}
+                    <div class="relative w-28 h-16 rounded-lg overflow-hidden border border-border shrink-0 bg-surface-2">
                         <template x-if="currentUrl">
                             <img :src="currentUrl" alt="Hero 背景图" class="w-full h-full object-cover">
                         </template>
                         <template x-if="!currentUrl">
-                            <div class="w-full h-full flex items-center justify-center text-text-muted text-xs">
-                                未设置（自动取最新文章）
+                            <div class="w-full h-full flex items-center justify-center text-text-muted text-[10px] leading-tight text-center px-1">
+                                自动取文章图
                             </div>
                         </template>
                     </div>
 
-                    {{-- 操作区 --}}
-                    <div class="flex-1 space-y-3 w-full">
-                        <p class="text-sm text-text-secondary">
-                            首页全屏 Hero 区域的背景图。不设置时自动使用最新文章的封面图。
-                        </p>
-                        <div class="flex flex-wrap gap-2">
+                    {{-- 信息 + 操作（紧凑一行） --}}
+                    <div class="flex-1 min-w-0 flex items-center gap-3">
+                        <div class="min-w-0">
+                            <p class="text-sm font-medium text-text truncate">首页 Hero 背景图</p>
+                            <p class="text-xs text-text-secondary mt-0.5 hidden sm:block">不设置时自动使用最新文章封面</p>
+                        </div>
+
+                        <div class="flex items-center gap-2 shrink-0 ml-auto">
                             <input type="file" accept="image/*" class="hidden" x-ref="heroFile"
                                    @change="onFileChange($event)">
                             <button type="button"
-                                    class="px-4 py-2 rounded-lg bg-primary text-sm font-medium text-white hover:bg-primary-hover transition disabled:opacity-50"
+                                    class="px-3 py-1.5 rounded-lg bg-primary text-xs font-medium text-white hover:bg-primary-hover transition disabled:opacity-50 whitespace-nowrap"
                                     :disabled="uploading"
                                     @click="$refs.heroFile.click()">
-                                <span x-show="!uploading">上传背景图</span>
+                                <span x-show="!uploading">更换</span>
                                 <span x-show="uploading" x-cloak>上传中…</span>
                             </button>
                             <button type="button"
-                                    class="px-4 py-2 rounded-lg border border-border text-sm font-medium text-text hover:bg-surface transition"
+                                    class="px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-text hover:bg-surface transition whitespace-nowrap"
                                     x-show="currentUrl"
                                     @click="remove()">
                                 移除
                             </button>
                         </div>
-                        <template x-if="error">
-                            <p class="text-xs text-red-600" x-text="error"></p>
-                        </template>
-                        <template x-if="success">
-                            <p class="text-xs text-green-600" x-text="success"></p>
-                        </template>
                     </div>
                 </div>
+                {{-- 提示消息 --}}
+                <template x-if="error">
+                    <p class="text-xs text-red-600 mt-2" x-text="error"></p>
+                </template>
+                <template x-if="success">
+                    <p class="text-xs text-green-600 mt-2" x-text="success"></p>
+                </template>
             </div>
 
             {{-- Recent Notes --}}
