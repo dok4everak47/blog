@@ -2,19 +2,97 @@
 @section('title', 'My Blog')
 
 @section('content')
+
+{{-- ====== Hero 全屏区域 ====== --}}
+<section class="hero-section" id="hero">
+  {{-- 背景图层 --}}
+  <div class="hero-bg">
+    @php
+      // 优先取最新文章的封面图/正文首图作为 hero 背景
+      $heroImage = null;
+      if ($notes->isNotEmpty()) {
+        $latest = $notes->first();
+        $heroImage = $latest->cover_image_url;
+        if (!$heroImage && $latest->content) {
+          if (preg_match('/!\[.*?\]\(([^)]+)\)/', $latest->content, $m)) {
+            $heroImage = $m[1];
+          }
+        }
+      }
+    @endphp
+    @if ($heroImage)
+      <img src="{{ $heroImage }}" alt="hero background">
+    @else
+      <div class="hero-bg-fallback"></div>
+    @endif
+  </div>
+
+  {{-- 暗色遮罩 --}}
+  <div class="hero-overlay"></div>
+
+  {{-- 中心内容 --}}
+  <div class="hero-content">
+    <h1 class="hero-title hero-animate-fade-in-down">My Blog</h1>
+
+    <div class="hero-quote hero-animate-slit-in">
+      <svg class="hero-quote-icon" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M7.17 6A5.001 5.001 0 0 0 2 11v7h7v-7H5.5a3.5 3.5 0 0 1 3.5-3.5V6h-1.83zm12 0A5.001 5.001 0 0 0 14 11v7h7v-7h-3.5a3.5 3.5 0 0 1 3.5-3.5V6h-1.83z"/>
+      </svg>
+      <span class="hero-quote-text">万物合鸣 · 独守一荒 —— 记录生活与思考的每一刻</span>
+      <svg class="hero-quote-icon" fill="currentColor" viewBox="0 0 24 24" style="margin-top: auto; margin-bottom: 0.15rem;">
+        <path d="M16.83 18A5.001 5.001 0 0 0 22 13V6h-7v7h3.5a3.5 3.5 0 0 1-3.5 3.5V18h1.83zm-12 0A5.001 5.001 0 0 0 10 13V6H3v7h3.5a3.5 3.5 0 0 1-3.5 3.5V18h1.83z"/>
+      </svg>
+    </div>
+
+    <div class="hero-social hero-animate-fade-in-up">
+      <a href="{{ route('notes.index') }}" aria-label="文章" title="全部文章">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+        </svg>
+      </a>
+      <a href="{{ route('about') }}" aria-label="关于" title="关于">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg>
+      </a>
+      <a href="{{ route('contact') }}" aria-label="联系" title="Contact">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  {{-- 向下滚动按钮 --}}
+  <button class="hero-scroll-down hero-animate-float" onclick="document.getElementById('hero-content').scrollIntoView({behavior:'smooth'})" aria-label="向下滚动">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+    </svg>
+  </button>
+
+  {{-- 底部波浪 --}}
+  <div class="hero-waves">
+    <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,40 C240,80 480,0 720,40 C960,80 1200,0 1440,40 L1440,80 L0,80 Z" fill="#FDFCFA"/>
+    </svg>
+  </div>
+</section>
+
+{{-- ====== Hero 下方内容区 ====== --}}
+<div class="hero-below-content" id="hero-content">
   <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
     {{-- Top Section: Welcome + Featured --}}
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
       {{-- Welcome Card --}}
       <div class="rounded-2xl border border-border bg-surface-2 p-8 sm:p-10 flex flex-col justify-center">
         <p class="text-xs font-medium tracking-[0.2em] text-primary uppercase mb-4">Welcome</p>
-        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-3">合荒小站</h1>
-        <p class="text-sm text-text-secondary mb-6">HeuhangSite</p>
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-3">My Blog</h1>
+        <p class="text-sm text-text-secondary mb-6">Personal Blog</p>
         <div class="border-t border-border pt-5 mt-auto">
           <p class="text-xs font-medium tracking-[0.15em] text-primary uppercase mb-2">Overview</p>
           <p class="text-sm text-text-secondary leading-relaxed">
-            万物合鸣·独守一荒<br>
-            RIM 的生活与思考
+            记录生活与思考<br>
+            分享技术与感悟
           </p>
         </div>
       </div>
@@ -25,7 +103,7 @@
         <div class="relative z-10">
           <p class="text-xs font-medium tracking-[0.2em] text-gold uppercase mb-4">Featured</p>
           <div class="flex items-baseline gap-3 mb-2">
-            <span class="text-6xl sm:text-7xl font-extrabold text-gold leading-none">2026</span>
+            <span class="text-6xl sm:text-7xl font-extrabold text-gold leading-none">{{ date('Y') }}</span>
             <span class="text-lg text-text-secondary">无限进步~</span>
           </div>
         </div>
@@ -182,4 +260,6 @@
       </div>
     </section>
   </main>
+</div>
+
 @endsection
