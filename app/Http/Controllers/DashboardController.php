@@ -53,12 +53,12 @@ class DashboardController extends Controller
 
         // 手动校验（web 路由必须显式返回 JSON 422，否则 validate() 返回 302）
         $validator = Validator::make($request->all(), [
-            'image' => 'required|image|mimes:jpeg,png,jpg,webp,gif|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp,gif|max:10240',
         ], [
             'image.required' => '请选择图片文件',
             'image.image'   => '文件必须是有效图片',
             'image.mimes'  => '仅支持 JPEG、PNG、WebP、GIF 格式',
-            'image.max'    => '图片大小不能超过 2MB',
+            'image.max'    => '图片大小不能超过 10MB',
         ]);
 
         if ($validator->fails()) {
