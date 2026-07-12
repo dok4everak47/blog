@@ -1,16 +1,7 @@
-<!DOCTYPE html>
-<html lang="zh">
+@extends('layouts.blog')
+@section('title', 'My Blog')
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My Blog</title>
-  @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-
-<body class="bg-bg min-h-screen text-text">
-  <x-nav />
-
+@section('content')
   <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
     {{-- Top Section: Welcome + Featured --}}
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
@@ -190,12 +181,5 @@
         </div>
       </div>
     </section>
-
-    {{-- Footer --}}
-    <footer class="mt-16 pt-10 border-t border-border text-center">
-      <p class="text-sm text-text-secondary">© 2026 My Blog · 记录学习与生活的每一刻</p>
-    </footer>
   </main>
-</body>
-
-</html>
+@endsection

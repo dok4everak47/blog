@@ -50,7 +50,7 @@ class NoteController extends Controller
             ? $request->file('cover_image')->store('covers', 'public')
             : null;
 
-        $note = Note::create([
+        $note = auth()->user()->notes()->create([
             'title' => $request->title,
             'content' => $request->content,
             'category_id' => $request->category_id,
@@ -74,7 +74,8 @@ class NoteController extends Controller
      */
     public function show(Note $note): View
     {
-        if ($note->isDraft() && !auth()->check()) {
+        // 草稿仅作者本人可见；未登录或非作者访问 → 404
+        if ($note->isDraft() && (!auth()->check() || $note->user_id !== auth()->id())) {
             abort(404);
         }
 
@@ -197,7 +198,7 @@ class NoteController extends Controller
                 $attrs['cover_image'] = $request->file('cover_image')->store('covers', 'public');
             }
             $attrs['status'] = 'draft';
-            $note = Note::create($attrs);
+            $note = auth()->user()->notes()->create($attrs);
             $note->tags()->sync($data['tags'] ?? []);
         }
 

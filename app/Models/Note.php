@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Tag;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Storage;
 
@@ -59,6 +60,16 @@ class Note extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * 作者（多作者/权限隔离的基础）。
+     * 注意：user_id 不进入 $fillable，只能由控制器通过
+     * auth()->user()->notes()->create() 赋值，杜绝表单伪造归属。
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     /**

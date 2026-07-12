@@ -1,15 +1,7 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ $note->title }}</title>
-  @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
+@extends('layouts.blog')
+@section('title', ($note->title ?? '') . ' · My Blog')
 
-<body class="bg-bg min-h-screen text-text">
-  <x-nav />
-
+@section('content')
   <main class="max-w-2xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
     <article>
       <p class="text-xs font-medium tracking-[0.2em] text-primary uppercase mb-4">文章</p>
@@ -112,5 +104,4 @@
       @endauth
     </div>
   </main>
-</body>
-</html>
+@endsection

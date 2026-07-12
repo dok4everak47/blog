@@ -1,15 +1,7 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>联系我们</title>
-  @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
+@extends('layouts.blog')
+@section('title', '联系我们 · My Blog')
 
-<body class="bg-bg min-h-screen text-text">
-  <x-nav />
-
+@section('content')
   <main class="flex items-center justify-center min-h-[calc(100vh-64px)] px-4 py-16">
     <div class="text-center max-w-md">
       <div class="w-16 h-16 rounded-2xl bg-sage-light flex items-center justify-center mx-auto mb-6">
@@ -24,5 +16,4 @@
       </a>
     </div>
   </main>
-</body>
-</html>
+@endsection

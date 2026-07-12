@@ -1,15 +1,7 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>搜索{{ $q ? '：' . $q : '' }} · My Blog</title>
-  @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
+@extends('layouts.blog')
+@section('title', '搜索' . ($q ? '：' . $q : '') . ' · My Blog')
 
-<body class="bg-bg min-h-screen text-text">
-  <x-nav />
-
+@section('content')
   <main class="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
     {{-- 页头 + 搜索框 --}}
     <div class="mb-10">
@@ -81,5 +73,4 @@
       </div>
     @endif
   </main>
-</body>
-</html>
+@endsection
