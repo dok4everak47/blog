@@ -28,61 +28,34 @@ class DashboardController extends Controller
         $categoriesCount = Category::count();
         $tagsCount = Tag::count();
         $heroImage = SiteSetting::get('hero_image');
-        $aboutContent = SiteSetting::get('about_content', []);
+        $aboutHtml = SiteSetting::get('about_html', '');
 
-        return view('dashboard', compact('notes', 'notesCount', 'categoriesCount', 'tagsCount', 'heroImage', 'aboutContent'));
+        return view('dashboard', compact('notes', 'notesCount', 'categoriesCount', 'tagsCount', 'heroImage', 'aboutHtml'));
     }
 
     /**
-     * 获取 About 页面内容配置
+     * 获取 About 页面富文本内容
      */
     public function getAboutContent(): JsonResponse
     {
-        $content = SiteSetting::get('about_content', [
-            'greeting' => 'hello，很高兴遇见你，陌生人。相见即是幸运，那下面是关于我的一些介绍 😊',
-            'self' => [
-                ['icon' => '👋', 'label' => '称呼', 'value' => '你可以称我为 Dok4ever 或 4ever'],
-                ['icon' => '🎓', 'label' => '身份', 'value' => '应届毕业生 / Laravel 学习者'],
-                ['icon' => '🌍', 'label' => '坐标', 'value' => '中国 · 广西'],
-                ['icon' => '🌱', 'label' => '目前状态', 'value' => '正在从零学习 Laravel'],
-                ['icon' => '🏷️', 'label' => '标签', 'value' => 'Laravel 初学者 | PHP 新手 | 技术爱好者'],
-            ],
-            'tech' => [
-                ['label' => '后端框架', 'value' => 'Laravel 13（正在深入学习中～）'],
-                ['label' => '前端技术', 'value' => 'Tailwind CSS v4 · Alpine.js · Vite'],
-                ['label' => '语言基础', 'value' => 'PHP 8.3 · 正在补齐 JavaScript 和 SQL'],
-                ['label' => '目标', 'value' => '把 Laravel 学精，做出有个人风格的博客系统 ✨'],
-            ],
-            'contact_intro' => "如果想交换友链可以去友链界面；\n和我临时聊天可以去留言板；\n如有任何问题欢迎给我发邮件。",
-            'email' => 'girlsfrontline45@gmail.com',
-        ]);
-
-        return response()->json($content);
+        $html = SiteSetting::get('about_html', '');
+        return response()->json(['html' => $html]);
     }
 
     /**
-     * 保存 About 页面内容配置
+     * 保存 About 页面富文本内容
      */
     public function updateAboutContent(Request $request): JsonResponse
     {
-        $data = $validator = Validator::make($request->all(), [
-            'greeting' => 'nullable|string|max:500',
-            'self' => 'nullable|array|max:10',
-            'self.*.icon' => 'nullable|string|max:10',
-            'self.*.label' => 'nullable|string|max:50',
-            'self.*.value' => 'nullable|string|max:300',
-            'tech' => 'nullable|array|max:10',
-            'tech.*.label' => 'nullable|string|max:50',
-            'tech.*.value' => 'nullable|string|max:500',
-            'contact_intro' => 'nullable|string|max:1000',
-            'email' => 'nullable|email|max:100',
+        $validator = Validator::make($request->all(), [
+            'html' => 'nullable|string|max:20000',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()->toArray()], 422);
         }
 
-        SiteSetting::set('about_content', $request->all());
+        SiteSetting::set('about_html', $request->input('html', ''));
 
         return response()->json(['message' => 'About 内容已更新']);
     }

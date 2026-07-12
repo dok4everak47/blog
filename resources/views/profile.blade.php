@@ -10,12 +10,7 @@
 
 @section('content')
 @php
-    $about = \App\Models\SiteSetting::get('about_content', []);
-    $greeting = $about['greeting'] ?? 'hello，很高兴遇见你，陌生人。相见即是幸运，那下面是关于我的一些介绍 😊';
-    $selfItems = $about['self'] ?? [];
-    $techItems = $about['tech'] ?? [];
-    $contactIntro = $about['contact_intro'] ?? "如有任何问题欢迎给我发邮件。";
-    $email = $about['email'] ?? '';
+    $aboutHtml = \App\Models\SiteSetting::get('about_html', '');
 @endphp
 
 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
@@ -32,81 +27,14 @@
         </h1>
       </header>
 
-      {{-- 开场白 --}}
-      @if($greeting)
-      <section class="mb-10">
-        <p class="text-text-secondary leading-[1.85] text-[15px]">{!! nl2br(e($greeting)) !!}</p>
-      </section>
+      {{-- 富文本内容区域 --}}
+      @if($aboutHtml)
+      <article class="about-content text-[15px] leading-[1.85] text-text-secondary prose-custom">
+        {!! \Illuminate\Support\Str::purify($aboutHtml) !!}
+      </article>
+      @else
+      <p class="text-text-muted italic py-8">暂无内容…</p>
       @endif
-
-      {{-- 虚线分隔 --}}
-      <hr class="border-dashed border-border my-10">
-
-      {{-- 个人信息 --}}
-      @if(!empty($selfItems))
-      <section class="mb-10" id="self">
-        <h2 class="text-xl font-bold text-text flex items-center gap-2 mb-6">
-          <span class="text-primary">♦</span>
-          关于·自我
-        </h2>
-
-        <div class="space-y-4">
-          @foreach($selfItems as $item)
-          @if(!empty($item['value']))
-          <div class="flex items-start gap-3">
-            <span class="shrink-0 mt-0.5">{{ $item['icon'] ?? '' }}</span>
-            <div class="leading-relaxed">
-              <span class="text-primary font-medium">{{ $item['label'] }}：</span>
-              <span class="text-text">{{ $item['value'] }}</span>
-            </div>
-          </div>
-          @endif
-          @endforeach
-        </div>
-      </section>
-      @endif
-
-      {{-- 虚线分隔 --}}
-      @if(!empty($techItems))
-      <hr class="border-dashed border-border my-10">
-
-      {{-- 技术栈 / 兴趣 --}}
-      <section class="mb-10" id="tech">
-        <h2 class="text-xl font-bold text-text flex items-center gap-2 mb-6">
-          <span class="text-primary">♦</span>
-          技术·兴趣
-        </h2>
-
-        <div class="space-y-4">
-          @foreach($techItems as $item)
-          @if(!empty($item['value']))
-          <div class="leading-relaxed">
-            <span class="text-primary font-medium">{{ $item['label'] }}：</span>
-            <span class="text-text">{!! nl2br(e($item['value'])) !!}</span>
-          </div>
-          @endif
-          @endforeach
-        </div>
-      </section>
-      @endif
-
-      {{-- 虚线分隔 --}}
-      <hr class="border-dashed border-border my-10">
-
-      {{-- 联系方式 --}}
-      <section class="mb-10" id="contact">
-        <h2 class="text-xl font-bold text-text flex items-center gap-2 mb-6">
-          <span class="text-primary">♦</span>
-          关于·联系
-        </h2>
-
-        <div class="space-y-3 text-text-secondary leading-[1.85]">
-          {!! nl2br(e($contactIntro)) !!}
-          @if($email)
-          <p>邮箱：<a href="mailto:{{ $email }}" class="text-primary hover:text-primary-hover transition underline decoration-primary/30 hover:decoration-primary/60">{{ $email }}</a></p>
-          @endif
-        </div>
-      </section>
 
       {{-- 虚线分隔 --}}
       <hr class="border-dashed border-border my-10">
@@ -155,29 +83,52 @@
       @endif
     </div>
 
-    {{-- ====== 右侧导航栏 ====== --}}
+    {{-- ====== 右侧导航栏（固定锚点导航） ====== --}}
     <aside class="hidden lg:block w-52 shrink-0">
       <div class="sticky top-24">
         <p class="text-xs font-medium tracking-[0.15em] text-text-muted uppercase mb-4">页面目录</p>
-        <nav class="space-y-1">
-          <a href="#self"
-             class="flex items-center gap-2.5 text-sm py-2 px-3 rounded-lg border-l-[3px] border-primary bg-primary-light/40 text-primary font-medium transition">
-            <span>😊</span> 关于·自我
-          </a>
-          @if(!empty($techItems))
-          <a href="#tech"
-             class="flex items-center gap-2.5 text-sm py-2 px-3 rounded-lg border-l-[3px] border-transparent text-text-secondary hover:text-text hover:border-border-strong hover:bg-surface-2 transition">
-            <span>⚡</span> 技术·兴趣
-          </a>
-          @endif
-          <a href="#contact"
-             class="flex items-center gap-2.5 text-sm py-2 px-3 rounded-lg border-l-[3px] border-transparent text-text-secondary hover:text-text hover:border-border-strong hover:bg-surface-2 transition">
-            <span>💬</span> 关于·联系
-          </a>
+        <nav id="about-toc" class="space-y-1">
+          {{-- 由 JS 动态生成：提取 h2/h3 标题生成目录 --}}
         </nav>
       </div>
     </aside>
 
   </div>
 </div>
+
+{{-- 动态生成右侧 TOC 目录 --}}
+<script>
+(function() {
+    var tocContainer = document.getElementById('about-toc');
+    if (!tocContainer) return;
+    var article = document.querySelector('.about-content');
+    if (!article) return;
+
+    var headings = article.querySelectorAll('h2, h3');
+    var icons = { h2: '📌', h3: '└' };
+
+    headings.forEach(function(h, i) {
+        if (!h.id) {
+            h.id = 'about-heading-' + i;
+        }
+        var a = document.createElement('a');
+        a.href = '#' + h.id;
+        a.className = 'flex items-center gap-2.5 text-sm py-2 px-3 rounded-lg border-l-[3px] border-transparent text-text-secondary hover:text-text hover:border-border-strong hover:bg-surface-2 transition';
+        a.innerHTML = '<span>' + (icons[h.tagName.toLowerCase()] || '•') + '</span> ' + h.textContent.trim();
+
+        // 高亮当前可见标题
+        a.addEventListener('click', function() { tocContainer.querySelectorAll('a').forEach(function(el) {
+            el.classList.remove('border-primary', 'bg-primary-light/40', 'text-primary', 'font-medium');
+            el.classList.add('border-transparent');
+        });
+        this.classList.add('border-primary', 'bg-primary-light/40', 'text-primary', 'font-medium');
+        this.classList.remove('border-transparent'); });
+
+        tocContainer.appendChild(a);
+    });
+    // 默认高亮第一个
+    var first = tocContainer.querySelector('a');
+    if (first) first.click();
+})();
+</script>
 @endsection

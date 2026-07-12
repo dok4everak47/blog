@@ -120,91 +120,101 @@
                 </template>
             </div>
 
-            {{-- 站点设置：About 页面内容 --}}
-            <div class="rounded-2xl border border-border bg-surface-2 p-5 sm:p-6" x-data="aboutEditor({{ Illuminate\Support\Js::from($aboutContent) }})">
-                <div class="flex items-center justify-between mb-5">
+            {{-- 站点设置：About 页面内容（富文本编辑） --}}
+            <div class="rounded-2xl border border-border bg-surface-2 p-5 sm:p-6" x-data="aboutEditor({{ Illuminate\Support\Js::from($aboutHtml) }})">
+                <div class="flex items-center justify-between mb-4">
                     <div>
                         <p class="text-sm font-medium text-text">About 页面内容</p>
-                        <p class="text-xs text-text-secondary mt-0.5">编辑「关于」页面的个人信息和介绍文字</p>
+                        <p class="text-xs text-text-secondary mt-0.5">使用富文本编辑器编写「关于」页面内容</p>
                     </div>
-                    <a href="{{ route('about') }}" target="_blank" class="text-xs text-primary hover:text-primary-hover transition flex items-center gap-1">
-                        预览页面
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                    </a>
-                </div>
-
-                {{-- 开场白 --}}
-                <div class="mb-5">
-                    <label class="block text-xs font-medium text-text-secondary mb-1.5">开场白</label>
-                    <textarea x-model="data.greeting" rows="2" placeholder="hello，很高兴遇见你…"
-                              class="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 resize-y"></textarea>
-                </div>
-
-                {{-- 自我介绍（可增删行） --}}
-                <div class="mb-5">
-                    <div class="flex items-center justify-between mb-2">
-                        <label class="text-xs font-medium text-text-secondary">自我介绍条目</label>
-                        <button type="button" @click="addSelfItem()" class="text-xs text-primary hover:text-primary-hover transition">+ 添加条目</button>
-                    </div>
-                    <div class="space-y-2">
-                        <template x-for="(item, index) in data.self" :key="index">
-                            <div class="flex gap-2">
-                                <select :x-model="`data.self[${index}].icon`" class="w-20 shrink-0 rounded-lg border border-border bg-surface px-2 py-2 text-base text-center outline-none focus:border-primary">
-                                    <option value="">👋</option><option value="🎓">🎓</option><option value="🌍">🌍</option><option value="🌱">🌱</option><option value="🏷️">🏷️</option><option value="💼">💼</option><option value="🎮">🎮</option><option value="☕">☕</option><option value="📚">📚</option><option value="🎵">🎵</option>
-                                </select>
-                                <input :x-model="`data.self[${index}].label`" type="text" placeholder="标签（如：称呼）"
-                                       class="w-24 shrink-0 rounded-lg border border-border bg-surface px-2.5 py-2 text-sm outline-none focus:border-primary">
-                                <input :x-model="`data.self[${index}].value`" type="text" placeholder="内容（如：Dok4ever）"
-                                       class="flex-1 min-w-0 rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary">
-                                <button type="button" @click="removeSelfItem(index)" class="shrink-0 p-2 text-text-muted hover:text-red-500 transition" x-show="data.self.length > 1">✕</button>
-                            </div>
-                        </template>
+                    <div class="flex items-center gap-3">
+                        <a href="{{ route('about') }}" target="_blank" class="text-xs text-primary hover:text-primary-hover transition flex items-center gap-1">
+                            预览页面
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                        </a>
                     </div>
                 </div>
 
-                {{-- 技术栈 / 兴趣 --}}
-                <div class="mb-5">
-                    <div class="flex items-center justify-between mb-2">
-                        <label class="text-xs font-medium text-text-secondary">技术 & 兴趣</label>
-                        <button type="button" @click="addTechItem()" class="text-xs text-primary hover:text-primary-hover transition">+ 添加条目</button>
-                    </div>
-                    <div class="space-y-2">
-                        <template x-for="(item, index) in data.tech" :key="'t'+index">
-                            <div class="flex gap-2">
-                                <input :x-model="`data.tech[${index}].label`" type="text" placeholder="标题（如：后端框架）"
-                                       class="w-28 shrink-0 rounded-lg border border-border bg-surface px-2.5 py-2 text-sm outline-none focus:border-primary">
-                                <input :x-model="`data.tech[${index}].value`" type="text" placeholder="内容（如：Laravel 13）"
-                                       class="flex-1 min-w-0 rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary">
-                                <button type="button" @click="removeTechItem(index)" class="shrink-0 p-2 text-text-muted hover:text-red-500 transition" x-show="data.tech.length > 1">✕</button>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-
-                {{-- 联系信息 --}}
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-                    <div>
-                        <label class="block text-xs font-medium text-text-secondary mb-1.5">联系说明</label>
-                        <textarea x-model="data.contact_intro" rows="3" placeholder="如果想交换友链…&#10;和我临时聊天可以去留言板…"
-                                  class="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 resize-y"></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-text-secondary mb-1.5">联系邮箱</label>
-                        <input x-model="data.email" type="email" placeholder="your@email.com"
-                               class="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/10">
-                    </div>
-                </div>
-
-                {{-- 操作栏 --}}
-                <div class="flex items-center gap-3 pt-3 border-t border-border">
-                    <button type="button" @click="save()" :disabled="saving"
-                            class="px-5 py-2 rounded-lg bg-primary text-sm font-medium text-white hover:bg-primary-hover transition disabled:opacity-50">
-                        <span x-show="!saving">保存修改</span>
-                        <span x-show="saving" x-cloak>保存中…</span>
+                {{-- TipTap 工具栏 --}}
+                <div class="flex flex-wrap items-center gap-1 p-2 rounded-lg bg-surface border border-border mb-2">
+                    <button type="button" @click="editor.chain().focus().toggleBold().run()"
+                            :class="{ 'bg-primary-light text-primary': editor.isActive('bold') }"
+                            class="w-8 h-8 flex items-center justify-center rounded text-sm font-bold text-text-secondary hover:bg-surface-2 transition" title="粗体 (Ctrl+B)">
+                        B
                     </button>
-                    <template x-if="msg">
-                        <p class="text-xs" :class="msgType === 'error' ? 'text-red-600' : 'text-green-600'" x-text="msg"></p>
-                    </template>
+                    <button type="button" @click="editor.chain().focus().toggleItalic().run()"
+                            :class="{ 'bg-primary-light text-primary': editor.isActive('italic') }"
+                            class="w-8 h-8 flex items-center justify-center rounded text-sm italic text-text-secondary hover:bg-surface-2 transition" title="斜体 (Ctrl+I)">
+                        I
+                    </button>
+                    <button type="button" @click="editor.chain().focus().toggleStrike().run()"
+                            :class="{ 'bg-primary-light text-primary': editor.isActive('strike') }"
+                            class="w-8 h-8 flex items-center justify-center rounded text-sm line-through text-text-secondary hover:bg-surface-2 transition" title="删除线">
+                        S
+                    </button>
+
+                    <div class="w-px h-5 bg-border mx-1"></div>
+
+                    <button type="button" @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
+                            :class="{ 'bg-primary-light text-primary': editor.isActive('heading', { level: 2 }) }"
+                            class="h-8 px-2 flex items-center justify-center rounded text-xs font-bold text-text-secondary hover:bg-surface-2 transition" title="标题 H2">
+                        H2
+                    </button>
+                    <button type="button" @click="editor.chain().focus().toggleHeading({ level: 3 }).run()"
+                            :class="{ 'bg-primary-light text-primary': editor.isActive('heading', { level: 3 }) }"
+                            class="h-8 px-2 flex items-center justify-center rounded text-xs font-bold text-text-secondary hover:bg-surface-2 transition" title="标题 H3">
+                        H3
+                    </button>
+
+                    <div class="w-px h-5 bg-border mx-1"></div>
+
+                    <button type="button" @click="editor.chain().focus().toggleBulletList().run()"
+                            :class="{ 'bg-primary-light text-primary': editor.isActive('bulletList') }"
+                            class="w-8 h-8 flex items-center justify-center rounded text-text-secondary hover:bg-surface-2 transition" title="无序列表">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    </button>
+                    <button type="button" @click="editor.chain().focus().toggleOrderedList().run()"
+                            :class="{ 'bg-primary-light text-primary': editor.isActive('orderedList') }"
+                            class="w-8 h-8 flex items-center justify-center rounded text-text-secondary hover:bg-surface-2 transition" title="有序列表">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/></svg>
+                    </button>
+                    <button type="button" @click="editor.chain().focus().toggleBlockquote().run()"
+                            :class="{ 'bg-primary-light text-primary': editor.isActive('blockquote') }"
+                            class="w-8 h-8 flex items-center justify-center rounded text-sm text-text-secondary hover:bg-surface-2 transition" title="引用">
+                        ❝
+                    </button>
+
+                    <div class="w-px h-5 bg-border mx-1"></div>
+
+                    <button type="button" @click="editor.chain().focus().setHorizontalRule().run()"
+                            class="w-8 h-8 flex items-center justify-center rounded text-text-secondary hover:bg-surface-2 transition" title="分割线">
+                        —
+                    </button>
+                    <button type="button" @click="insertLink()"
+                            :class="{ 'bg-primary-light text-primary': editor.isActive('link') }"
+                            class="w-8 h-8 flex items-center justify-center rounded text-text-secondary hover:bg-surface-2 transition" title="插入链接">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                    </button>
+                </div>
+
+                {{-- 编辑区域 --}}
+                <div id="about-editor" class="min-h-[300px] max-h-[600px] overflow-y-auto rounded-lg border border-border bg-white dark:bg-gray-900 focus-within:border-primary transition-colors prose prose-sm max-w-none">
+                </div>
+
+                {{-- 字数统计 + 状态 --}}
+                <div class="flex items-center justify-between mt-3 pt-3 border-t border-border">
+                    <span class="text-[11px] text-text-muted" x-text="'约 ' + charCount + ' 字'"></span>
+                    <div class="flex items-center gap-3">
+                        <template x-if="msg">
+                            <p class="text-xs" :class="msgType === 'error' ? 'text-red-600' : 'text-green-600'" x-text="msg"></p>
+                        </template>
+                        <button type="button" @click="save()" :disabled="saving || !isDirty"
+                                class="px-5 py-2 rounded-lg text-sm font-medium transition disabled:opacity-40"
+                                :class="isDirty ? 'bg-primary text-white hover:bg-primary-hover' : 'bg-surface text-text-muted'">
+                            <span x-show="!saving">保存修改</span>
+                            <span x-show="saving" x-cloak>保存中…</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -533,50 +543,82 @@
             });
         });
 
-        window.aboutEditor = function (initialData) {
+        window.aboutEditor = function (initialHtml) {
             return {
-                data: initialData || {
-                    greeting: '',
-                    self: [{ icon: '👋', label: '', value: '' }],
-                    tech: [{ label: '', value: '' }],
-                    contact_intro: '',
-                    email: '',
-                },
+                editor: null,
                 saving: false,
                 msg: null,
                 msgType: '',
+                isDirty: false,
+                charCount: 0,
 
-                addSelfItem() {
-                    this.data.self.push({ icon: '👋', label: '', value: '' });
+                init() {
+                    var self = this;
+                    // 动态 import TipTap（避免全局污染）
+                    import('@tiptap/core').then(({ default: Core }) => {
+                        return import('@tiptap/starter-kit');
+                    }).then(({ default: StarterKit }) => {
+                        return import('@tiptap/pm').then(pm => ({ pm, StarterKit }));
+                    }).then(({ pm, StarterKit }) => {
+                        this.editor = new Core.Editor({
+                            element: document.getElementById('about-editor'),
+                            extensions: [
+                                StarterKit.configure({
+                                    heading: { levels: [2, 3] },
+                                }),
+                            ],
+                            content: initialHtml || '',
+                            onUpdate: () => {
+                                this.isDirty = true;
+                                this.updateCharCount();
+                            },
+                        });
+
+                        this.editor.on('update', () => {
+                            this.isDirty = true;
+                            this.updateCharCount();
+                        });
+                        this.updateCharCount();
+                    }).catch(function(err) {
+                        console.error('TipTap 加载失败:', err);
+                    });
                 },
-                removeSelfItem(index) {
-                    this.data.self.splice(index, 1);
+
+                updateCharCount() {
+                    if (this.editor) {
+                        var text = this.editor.getText();
+                        this.charCount = text.replace(/\s/g, '').length;
+                    }
                 },
-                addTechItem() {
-                    this.data.tech.push({ label: '', value: '' });
-                },
-                removeTechItem(index) {
-                    this.data.tech.splice(index, 1);
+
+                insertLink() {
+                    if (!this.editor) return;
+                    var url = prompt('请输入链接地址：', 'https://');
+                    if (url) {
+                        this.editor.chain().focus().setLink({ href: url }).run();
+                    }
                 },
 
                 async save() {
+                    if (!this.editor || !this.isDirty) return;
                     this.saving = true;
                     this.msg = null;
-                    const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
+                    var html = this.editor.getHTML();
+                    var token = document.querySelector('meta[name="csrf-token"]')?.content || '';
                     try {
                         const res = await fetch('/settings/about-content', {
                             method: 'POST',
                             headers: { 'X-CSRF-TOKEN': token, 'Content-Type': 'application/json' },
-                            body: JSON.stringify(this.data),
+                            body: JSON.stringify({ html: html }),
                         });
                         if (!res.ok) {
                             const d = await res.json().catch(() => ({}));
                             this.msg = Object.values(d.errors || {}).flat().join('；') || '保存失败';
                             this.msgType = 'error';
                         } else {
-                            const d = await res.json();
-                            this.msg = d.message || '已保存';
+                            this.msg = '已保存';
                             this.msgType = 'success';
+                            this.isDirty = false;
                             setTimeout(() => { this.msg = null; }, 3000);
                         }
                     } catch (e) {
