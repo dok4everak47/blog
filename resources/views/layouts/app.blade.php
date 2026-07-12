@@ -20,7 +20,7 @@
             })();
         </script>
 
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/about-editor.js'])
         <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}">
     </head>
     <body class="font-sans antialiased text-text bg-bg min-h-screen flex flex-col">

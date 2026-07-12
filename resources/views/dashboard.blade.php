@@ -553,35 +553,20 @@
                 charCount: 0,
 
                 init() {
-                    var self = this;
-                    // 动态 import TipTap（避免全局污染）
-                    import('@tiptap/core').then(({ default: Core }) => {
-                        return import('@tiptap/starter-kit');
-                    }).then(({ default: StarterKit }) => {
-                        return import('@tiptap/pm').then(pm => ({ pm, StarterKit }));
-                    }).then(({ pm, StarterKit }) => {
-                        this.editor = new Core.Editor({
-                            element: document.getElementById('about-editor'),
-                            extensions: [
-                                StarterKit.configure({
-                                    heading: { levels: [2, 3] },
-                                }),
-                            ],
+                    // 使用 Vite 预构建的 TipTap 模块
+                    if (typeof window.initAboutEditor === 'function') {
+                        this.editor = window.initAboutEditor({
+                            elementId: 'about-editor',
                             content: initialHtml || '',
-                            onUpdate: () => {
+                            onUpdate: function() {
                                 this.isDirty = true;
                                 this.updateCharCount();
-                            },
-                        });
-
-                        this.editor.on('update', () => {
-                            this.isDirty = true;
-                            this.updateCharCount();
+                            }.bind(this),
                         });
                         this.updateCharCount();
-                    }).catch(function(err) {
-                        console.error('TipTap 加载失败:', err);
-                    });
+                    } else {
+                        console.error('[aboutEditor] TipTap 模块未加载');
+                    }
                 },
 
                 updateCharCount() {
