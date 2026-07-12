@@ -248,14 +248,14 @@
                                         data-note-id="{{ $note->id }}"
                                         data-note-title="{{ $note->title }}"
                                         data-cover-url="{{ $note->cover_image_url ?? '' }}"
-                                        class="text-xs text-primary hover:text-primary-hover transition"
+                                        class="text-sm font-medium text-primary hover:text-primary-hover transition"
                                         @click="openModal($event.currentTarget)">换封面</button>
                                     <a href="{{ route('notes.edit', $note) }}"
-                                        class="text-xs text-primary hover:text-primary-hover transition">编辑</a>
+                                        class="text-sm font-medium text-primary hover:text-primary-hover transition">编辑</a>
                                     <form action="{{ route('notes.destroy', $note) }}" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-xs text-red-600 hover:text-red-700 transition"
+                                        <button type="submit" class="text-sm font-medium text-red-600 hover:text-red-700 transition"
                                             onclick="return confirm('确定要删除这篇文章吗？')">删除</button>
                                     </form>
                                 </div>
