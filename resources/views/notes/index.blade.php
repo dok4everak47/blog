@@ -82,8 +82,8 @@
 
           {{-- 右侧：封面图 / 内容首图 --}}
           @php
-            // 优先用封面图；没有则从正文提取第一张 Markdown 图片
-            $displayImage = $note->cover_image_url;
+            // 优先用缩略图，其次封面图，最后从正文提取第一张 Markdown 图片
+            $displayImage = $note->thumbnail_url ?: $note->cover_image_url;
             if (!$displayImage && $note->content) {
               if (preg_match('/!\[.*?\]\(([^)]+)\)/', $note->content, $m)) {
                 $displayImage = $m[1];

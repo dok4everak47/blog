@@ -202,7 +202,8 @@
 
               {{-- Cover Image / 内容首图 --}}
               @php
-                $homeDisplayImage = $note->cover_image_url;
+                // 优先用缩略图，其次封面图，最后从正文提取第一张 Markdown 图片
+                $homeDisplayImage = $note->thumbnail_url ?: $note->cover_image_url;
                 if (!$homeDisplayImage && $note->content) {
                   if (preg_match('/!\[.*?\]\(([^)]+)\)/', $note->content, $hm)) {
                     $homeDisplayImage = $hm[1];

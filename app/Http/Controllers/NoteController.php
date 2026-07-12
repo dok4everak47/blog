@@ -53,6 +53,9 @@ class NoteController extends Controller
             ? $request->file('cover_image')->store('covers', 'public')
             : null;
 
+        // 生成缩略图
+        $thumbnail = $cover ? Note::generateThumbnail($cover) : null;
+
         $note = auth()->user()->notes()->create([
             'title' => $request->title,
             'content' => $request->content,
@@ -61,6 +64,7 @@ class NoteController extends Controller
             'slug' => $this->makeSlug($request->slug, $request->title, null),
             'status' => $request->input('status', 'published'),
             'cover_image' => $cover,
+            'thumbnail_url' => $thumbnail,
         ]);
 
         if ($request->has('tags')) {
@@ -132,12 +136,20 @@ class NoteController extends Controller
             if ($note->cover_image) {
                 Storage::disk('public')->delete($note->cover_image);
             }
+            if ($note->thumbnail_url) {
+                Storage::disk('public')->delete($note->thumbnail_url);
+            }
             $data['cover_image'] = $request->file('cover_image')->store('covers', 'public');
+            $data['thumbnail_url'] = Note::generateThumbnail($data['cover_image']);
         } elseif ($request->boolean('remove_cover')) {
             if ($note->cover_image) {
                 Storage::disk('public')->delete($note->cover_image);
             }
+            if ($note->thumbnail_url) {
+                Storage::disk('public')->delete($note->thumbnail_url);
+            }
             $data['cover_image'] = null;
+            $data['thumbnail_url'] = null;
         }
 
         $note->update($data);
@@ -183,12 +195,20 @@ class NoteController extends Controller
                 if ($note->cover_image) {
                     Storage::disk('public')->delete($note->cover_image);
                 }
+                if ($note->thumbnail_url) {
+                    Storage::disk('public')->delete($note->thumbnail_url);
+                }
                 $attrs['cover_image'] = $request->file('cover_image')->store('covers', 'public');
+                $attrs['thumbnail_url'] = Note::generateThumbnail($attrs['cover_image']);
             } elseif ($request->boolean('remove_cover')) {
                 if ($note->cover_image) {
                     Storage::disk('public')->delete($note->cover_image);
                 }
+                if ($note->thumbnail_url) {
+                    Storage::disk('public')->delete($note->thumbnail_url);
+                }
                 $attrs['cover_image'] = null;
+                $attrs['thumbnail_url'] = null;
             }
 
             $note->update($attrs);
@@ -199,6 +219,7 @@ class NoteController extends Controller
 
             if ($request->hasFile('cover_image')) {
                 $attrs['cover_image'] = $request->file('cover_image')->store('covers', 'public');
+                $attrs['thumbnail_url'] = Note::generateThumbnail($attrs['cover_image']);
             }
             $attrs['status'] = NoteStatus::Draft->value;
             $note = auth()->user()->notes()->create($attrs);
@@ -263,15 +284,26 @@ class NoteController extends Controller
             if ($note->cover_image) {
                 Storage::disk('public')->delete($note->cover_image);
             }
+            if ($note->thumbnail_url) {
+                Storage::disk('public')->delete($note->thumbnail_url);
+            }
             $cover = $request->file('cover_image')->store('covers', 'public');
+            $thumbnail = Note::generateThumbnail($cover);
         } else { // remove_cover = true
             if ($note->cover_image) {
                 Storage::disk('public')->delete($note->cover_image);
             }
+            if ($note->thumbnail_url) {
+                Storage::disk('public')->delete($note->thumbnail_url);
+            }
             $cover = null;
+            $thumbnail = null;
         }
 
-        $note->update(['cover_image' => $cover]);
+        $note->update([
+            'cover_image' => $cover,
+            'thumbnail_url' => $thumbnail,
+        ]);
 
         return response()->json([
             'cover_url' => $note->cover_image_url,
@@ -312,6 +344,9 @@ class NoteController extends Controller
 
         if ($note->cover_image) {
             Storage::disk('public')->delete($note->cover_image);
+        }
+        if ($note->thumbnail_url) {
+            Storage::disk('public')->delete($note->thumbnail_url);
         }
 
         $note->delete();
