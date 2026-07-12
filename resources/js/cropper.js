@@ -3,13 +3,13 @@ import Cropper from 'cropperjs';
 /**
  * 打开图片裁剪弹窗，返回裁剪后的 Blob。
  *
- * @param {File} file       - 原始图片文件
+ * @param {File|Blob|String} source - 原始图片：File/Blob 或图片 URL
  * @param {Object} [opts]   - 可选配置
  * @param {number} [opts.aspectRatio=NaN] - 裁剪宽高比，NaN 表示自由裁剪
  * @param {number} [opts.maxWidth=1200]   - 输出最大宽度
  * @returns {Promise<Blob>} 如果取消则 reject
  */
-export function openImageCropper(file, opts = {}) {
+export function openImageCropper(source, opts = {}) {
     const aspectRatio = opts.aspectRatio || NaN;
     const maxWidth = opts.maxWidth || 1200;
 
@@ -17,27 +17,27 @@ export function openImageCropper(file, opts = {}) {
         // 构建弹窗 DOM
         const overlay = document.createElement('div');
         overlay.innerHTML = `
-            <div class="cropper-overlay">
-                <div class="cropper-modal">
-                    <div class="cropper-header">
-                        <span class="cropper-title">裁剪封面图</span>
-                        <button type="button" class="cropper-close" id="cropper-cancel">&times;</button>
+            <div class="img-cropper-overlay">
+                <div class="img-cropper-modal">
+                    <div class="img-cropper-header">
+                        <span class="img-cropper-title">裁剪封面图</span>
+                        <button type="button" class="img-cropper-close" id="cropper-cancel">&times;</button>
                     </div>
-                    <div class="cropper-body">
-                        <div class="cropper-container-wrap">
+                    <div class="img-cropper-body">
+                        <div class="img-cropper-container-wrap">
                             <img id="cropper-image" src="" alt="裁剪预览">
                         </div>
                     </div>
-                    <div class="cropper-footer">
-                        <div class="cropper-aspects">
-                            <button type="button" data-ratio="0" class="cropper-ratio-btn cropper-ratio-active">自由</button>
-                            <button type="button" data-ratio="1" class="cropper-ratio-btn">1:1</button>
-                            <button type="button" data-ratio="1.7778" class="cropper-ratio-btn">16:9</button>
-                            <button type="button" data-ratio="1.3333" class="cropper-ratio-btn">4:3</button>
+                    <div class="img-cropper-footer">
+                        <div class="img-cropper-aspects">
+                            <button type="button" data-ratio="0" class="img-cropper-ratio-btn img-cropper-ratio-active">自由</button>
+                            <button type="button" data-ratio="1" class="img-cropper-ratio-btn">1:1</button>
+                            <button type="button" data-ratio="1.7778" class="img-cropper-ratio-btn">16:9</button>
+                            <button type="button" data-ratio="1.3333" class="img-cropper-ratio-btn">4:3</button>
                         </div>
-                        <div class="cropper-actions">
-                            <button type="button" class="cropper-btn-cancel" id="cropper-btn-cancel">取消</button>
-                            <button type="button" class="cropper-btn-confirm" id="cropper-btn-confirm">确认裁剪</button>
+                        <div class="img-cropper-actions">
+                            <button type="button" class="img-cropper-btn-cancel" id="cropper-btn-cancel">取消</button>
+                            <button type="button" class="img-cropper-btn-confirm" id="cropper-btn-confirm">确认裁剪</button>
                         </div>
                     </div>
                 </div>
@@ -49,10 +49,11 @@ export function openImageCropper(file, opts = {}) {
         const cancelBtn = overlay.querySelector('#cropper-cancel');
         const cancelBtn2 = overlay.querySelector('#cropper-btn-cancel');
         const confirmBtn = overlay.querySelector('#cropper-btn-confirm');
-        const ratioBtns = overlay.querySelectorAll('.cropper-ratio-btn');
+        const ratioBtns = overlay.querySelectorAll('.img-cropper-ratio-btn');
 
         let cropper = null;
         let cleaned = false;
+        let objectUrl = null;
 
         const cleanup = () => {
             if (cleaned) return;
@@ -61,12 +62,26 @@ export function openImageCropper(file, opts = {}) {
                 cropper.destroy();
                 cropper = null;
             }
-            URL.revokeObjectURL(imgEl.src);
+            if (objectUrl) {
+                URL.revokeObjectURL(objectUrl);
+                objectUrl = null;
+            }
             overlay.remove();
         };
 
-        // 加载图片
-        imgEl.src = URL.createObjectURL(file);
+        // 加载图片：支持 File/Blob 和远程 URL
+        if (source instanceof Blob) {
+            objectUrl = URL.createObjectURL(source);
+            imgEl.src = objectUrl;
+        } else if (typeof source === 'string' && source.trim()) {
+            imgEl.src = source;
+            imgEl.crossOrigin = 'anonymous';
+        } else {
+            reject(new Error('不支持的图片源'));
+            cleanup();
+            return;
+        }
+
         imgEl.onload = () => {
             cropper = new Cropper(imgEl, {
                 aspectRatio,
@@ -85,11 +100,16 @@ export function openImageCropper(file, opts = {}) {
             });
         };
 
+        imgEl.onerror = () => {
+            reject(new Error('图片加载失败'));
+            cleanup();
+        };
+
         // 宽高比按钮
         ratioBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                ratioBtns.forEach(b => b.classList.remove('cropper-ratio-active'));
-                btn.classList.add('cropper-ratio-active');
+                ratioBtns.forEach(b => b.classList.remove('img-cropper-ratio-active'));
+                btn.classList.add('img-cropper-ratio-active');
                 const r = parseFloat(btn.dataset.ratio);
                 if (cropper) {
                     cropper.setAspectRatio(r || NaN);
@@ -113,7 +133,7 @@ export function openImageCropper(file, opts = {}) {
                     reject(new Error('图片处理失败'));
                 }
                 cleanup();
-            }, file.type, 0.9);
+            }, 'image/jpeg', 0.92);
         });
 
         // 取消
