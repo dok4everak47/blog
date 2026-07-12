@@ -15,14 +15,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. 创建用户（1 个管理员 + 9 个普通用户）
+        // 1. 只创建一个管理员用户
         $admin = User::factory()->create([
             'name' => 'Admin',
             'email' => 'admin@example.com',
             'is_admin' => true,
         ]);
-
-        $users = User::factory(9)->create();
 
         // 2. 创建分类
         $categories = \App\Models\Category::factory(6)->create();
@@ -30,9 +28,9 @@ class DatabaseSeeder extends Seeder
         // 3. 创建标签
         $tags = \App\Models\Tag::factory(12)->create();
 
-        // 4. 创建文章（50 篇，大部分已发布）
+        // 4. 创建文章，全部属于管理员
         $notes = \App\Models\Note::factory(50)
-            ->recycle($users)
+            ->recycle(User::all())
             ->published()
             ->create()
             ->each(function ($note) use ($tags) {
@@ -41,25 +39,23 @@ class DatabaseSeeder extends Seeder
 
         // 少量草稿
         \App\Models\Note::factory(5)
-            ->recycle($users)
+            ->recycle(User::all())
             ->draft()
             ->create()
             ->each(function ($note) use ($tags) {
                 $note->tags()->attach($tags->random(rand(0, 3)));
             });
 
-        // 5. 创建评论（每篇已发布文章 0~5 条评论 + 随机回复)
-        $allUsers = User::all();
+        // 5. 创建评论
         foreach ($notes->take(30) as $note) {
             $count = rand(0, 5);
             $comments = \App\Models\Comment::factory($count)
-                ->recycle($allUsers)
+                ->recycle(User::all())
                 ->create(['note_id' => $note->id]);
 
-            // 部分评论带回复
             foreach ($comments->take(rand(0, $count)) as $comment) {
                 \App\Models\Comment::factory(rand(0, 2))
-                    ->recycle($allUsers)
+                    ->recycle(User::all())
                     ->reply($comment)
                     ->create();
             }
