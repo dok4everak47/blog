@@ -73,14 +73,24 @@
             </p>
           </div>
 
-          {{-- 右侧：封面图 --}}
+          {{-- 右侧：封面图 / 内容首图 --}}
+          @php
+            // 优先用封面图；没有则从正文提取第一张 Markdown 图片
+            $displayImage = $note->cover_image_url;
+            if (!$displayImage && $note->content) {
+              if (preg_match('/!\[.*?\]\(([^)]+)\)/', $note->content, $m)) {
+                $displayImage = $m[1];
+              }
+            }
+          @endphp
+
           <div class="min-h-[200px] sm:min-h-auto relative overflow-hidden bg-surface-2">
-            @if ($note->cover_image_url)
-              <img src="{{ $note->cover_image_url }}" alt="{{ $note->title }}"
+            @if ($displayImage)
+              <img src="{{ $displayImage }}" alt="{{ $note->title }}"
                    loading="lazy"
                    class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
             @else
-              {{-- 无封面时的占位 --}}
+              {{-- 无封面也无内容图时的兜底占位 --}}
               <div class="absolute inset-0 bg-gradient-to-br from-sage-light/60 to-sage/20 flex items-center justify-center">
                 <div class="text-center">
                   <div class="w-20 h-20 rounded-2xl bg-white/60 backdrop-blur-sm flex items-center justify-center mx-auto mb-3 shadow-sm">
