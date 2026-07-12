@@ -135,12 +135,14 @@ $readTime = max(1, (int) ceil($charCount / 300));
                 <div class="flex items-center gap-2 mb-1">
                   <span class="text-sm font-medium text-text">{{ $comment->user->name }}</span>
                   <span class="text-xs text-text-muted">{{ $comment->created_at->diffForHumans() }}</span>
-                  @auth && $comment->user_id === auth()->id()
-                    <form action="{{ route('comments.destroy', $comment) }}" method="POST" class="ml-auto">
-                      @csrf
-                      @method('DELETE')
-                      <button type="submit" class="text-xs text-text-muted hover:text-red-500 transition">删除</button>
-                    </form>
+                  @auth
+                    @if($comment->user_id === auth()->id())
+                      <form action="{{ route('comments.destroy', $comment) }}" method="POST" class="ml-auto">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="text-xs text-text-muted hover:text-red-500 transition">删除</button>
+                      </form>
+                    @endif
                   @endauth
                 </div>
                 <p class="text-sm text-text-secondary leading-relaxed">{{ $comment->content }}</p>
