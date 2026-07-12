@@ -76,12 +76,13 @@ class NoteAuthorizationTest extends TestCase
         $this->get(route('notes.show', $note))->assertStatus(200);
     }
 
-    public function test_draft_note_returns_404_for_guest(): void
+    public function test_draft_note_returns_403_for_guest(): void
     {
         $author = User::factory()->create();
         $note = $this->makeNote($author, ['status' => 'draft', 'title' => '私密草稿']);
 
-        $this->get(route('notes.show', $note))->assertStatus(404);
+        // 未登录访客访问草稿 → 403 Forbidden（Policy 拦截，不再伪装成 404）
+        $this->get(route('notes.show', $note))->assertStatus(403);
     }
 
     public function test_draft_note_visible_to_owner(): void
@@ -93,15 +94,15 @@ class NoteAuthorizationTest extends TestCase
         $this->get(route('notes.show', $note))->assertStatus(200);
     }
 
-    public function test_draft_note_returns_404_for_other_user(): void
+    public function test_draft_note_returns_403_for_other_user(): void
     {
         $author = User::factory()->create();
         $note = $this->makeNote($author, ['status' => 'draft', 'title' => '私密草稿']);
         $other = User::factory()->create();
         $this->actingAs($other);
 
-        // 非作者即使已登录也看不到他人草稿
-        $this->get(route('notes.show', $note))->assertStatus(404);
+        // 非作者即使已登录也看不到他人草稿 → 403
+        $this->get(route('notes.show', $note))->assertStatus(403);
     }
 
     public function test_user_cannot_update_others_note(): void

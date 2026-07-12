@@ -52,6 +52,15 @@ class Note extends Model
     }
 
     /**
+     * 仅查询指定用户的文章（后台安全查询，防止跨用户数据泄露）
+     */
+    public function scopeForUser($query, ?User $user = null)
+    {
+        $user = $user ?? auth()->user();
+        return $query->where('user_id', $user?->id ?? 0);
+    }
+
+    /**
      * 预计阅读时间（分钟），中文按 ~400 字/分钟估算
      */
     public function readingMinutes(): int

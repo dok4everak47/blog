@@ -77,10 +77,8 @@ class NoteController extends Controller
      */
     public function show(Note $note): View
     {
-        // 草稿仅作者本人可见；未登录或非作者访问 → 404
-        if ($note->isDraft() && (!auth()->check() || $note->user_id !== auth()->id())) {
-            abort(404);
-        }
+        // Policy 双重校验：已发布→放行，草稿→仅作者（含 403/404）
+        $this->authorize('view', $note);
 
         $note->load('tags', 'category');
 
