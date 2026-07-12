@@ -40,7 +40,7 @@
               {{ $note->title }}
             </h3>
             <p class="text-sm text-text-secondary line-clamp-2 leading-relaxed">
-              {{ $note->content }}
+              {{ $note->excerpt ?: \App\Models\Note::generateExcerpt($note->content, 120) }}
             </p>
           </a>
         </article>
