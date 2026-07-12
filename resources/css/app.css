@@ -1,0 +1,631 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans: 'Instrument Sans', 'Noto Sans SC', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* 合荒小站 莫兰迪暖调色板 */
+    --color-bg: #FDFCFA;
+    --color-surface: #F9F8F6;
+    --color-surface-2: #FFFFFF;
+    --color-border: #EDEAE5;
+    --color-border-strong: #E0DCD6;
+    --color-text: #2C2A28;
+    --color-text-secondary: #8C8884;
+    --color-text-muted: #A9A6A1;
+    --color-primary: #D88C8C;
+    --color-primary-hover: #C77A7A;
+    --color-primary-light: #FAF0F0;
+    --color-sage: #9BB5A4;
+    --color-sage-hover: #8AA592;
+    --color-sage-light: #EEF3F0;
+    --color-gold: #C9A66B;
+    --color-gold-hover: #B8955A;
+    --color-gold-light: #F5F0E8;
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #FDFCFA;
+}
+
+::selection {
+    background-color: #FAF0F0;
+    color: #D88C8C;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #EDEAE5;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #D88C8C;
+}
+
+/* ============================================================
+   编辑器专属样式（写文章 / 编辑文章）
+   设计目标：以「专注写作」为核心，参考 Medium / Notion / GitHub 编辑器
+   ============================================================ */
+
+[x-cloak] {
+    display: none !important;
+}
+
+/* 写作区卡片：包裹标题与正文，提供纯净写作表面 */
+.card-editor {
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: 1rem;
+    padding: 1.5rem 1.75rem;
+    transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+.card-editor:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(216, 140, 140, 0.10);
+}
+
+/* 标题输入框：大号、加粗、无边框，区别于普通输入框 */
+.title-input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--color-text);
+    outline: none;
+    padding: 0.25rem 0;
+}
+.title-input::placeholder {
+    color: var(--color-text-muted);
+    font-weight: 600;
+}
+
+/* 正文编辑区：无边框、大字号、宽松行高、自动增高 */
+.editor-textarea {
+    width: 100%;
+    min-height: 600px;
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--color-text);
+    outline: none;
+    resize: none;
+    padding: 0.75rem 0 0;
+    overflow: hidden;
+}
+.editor-textarea::placeholder {
+    color: var(--color-text-muted);
+}
+
+/* 统一表单控件：分类 Select / Slug Input / 其它设置项 */
+.field-control {
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-border);
+    background-color: #fff;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    color: var(--color-text);
+    outline: none;
+    transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+.field-control::placeholder {
+    color: var(--color-text-muted);
+}
+.field-control:hover {
+    border-color: var(--color-border-strong);
+}
+.field-control:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(216, 140, 140, 0.15);
+}
+
+/* 标签 Chip：点击切换，Hover / Active 状态 */
+.tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 9999px;
+    border: 1px solid var(--color-border);
+    background: #fff;
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all 180ms ease;
+    user-select: none;
+}
+.tag-chip:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+.tag-chip.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+}
+
+/* 主要按钮：发布 */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0.5rem;
+    background: var(--color-primary);
+    color: #fff;
+    font-weight: 500;
+    font-size: 0.875rem;
+    padding: 0.625rem 1.4rem;
+    transition: background-color 200ms ease, transform 120ms ease, opacity 200ms ease;
+    cursor: pointer;
+}
+.btn-primary:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+}
+.btn-primary:active:not(:disabled) {
+    transform: scale(0.98);
+}
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* 次要按钮：存为草稿 */
+.btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-border);
+    background: #fff;
+    color: var(--color-text);
+    font-weight: 500;
+    font-size: 0.875rem;
+    padding: 0.625rem 1.4rem;
+    transition: all 200ms ease;
+    cursor: pointer;
+}
+.btn-ghost:hover:not(:disabled) {
+    border-color: var(--color-border-strong);
+    background: var(--color-surface);
+}
+.btn-ghost:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* 加载 spinner */
+.spinner {
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: editor-spin 0.6s linear infinite;
+}
+@keyframes editor-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+.spinner-sm {
+    width: 0.75rem;
+    height: 0.75rem;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    display: inline-block;
+    animation: editor-spin 0.6s linear infinite;
+}
+
+/* 保存成功 Toast */
+.toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-text);
+    color: #fff;
+    padding: 0.7rem 1.25rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    box-shadow: 0 8px 24px -8px rgba(44, 42, 40, 0.35);
+    z-index: 100;
+}
+
+/* ============================================================
+   封面图上传（写文章 / 编辑文章）
+   设计目标：与编辑器一致的莫兰迪暖调、细边框、轻交互
+   ============================================================ */
+
+/* 未设置封面时的拖拽上传区 */
+.cover-dropzone {
+    border: 1px dashed var(--color-border-strong);
+    border-radius: 0.75rem;
+    background: var(--color-surface);
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.375rem;
+    text-align: center;
+    color: var(--color-text-secondary);
+    transition: border-color 200ms ease, background-color 200ms ease;
+}
+.cover-dropzone:hover,
+.cover-dropzone.dragover {
+    border-color: var(--color-primary);
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+}
+
+/* 已设置封面：预览图 */
+.cover-preview-img {
+    width: 100%;
+    max-height: 320px;
+    object-fit: cover;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-border);
+    display: block;
+}
+
+/* 更换 / 移除 链接按钮 */
+.cover-link-btn {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: color 180ms ease;
+}
+.cover-link-btn:hover {
+    color: var(--color-primary);
+}
+.cover-link-btn.text-red-600 {
+    color: #dc2626;
+}
+.cover-link-btn.text-red-600:hover {
+    color: #b91c1c;
+}
+
+/* ============================================================
+   Markdown 工具栏 + 预览（写文章 / 编辑文章）
+   设计目标：极简、现代，参考 GitHub / Obsidian / Hashnode
+   ============================================================ */
+
+/* 工具栏：吸顶固定在编辑器顶部 */
+.md-toolbar {
+    position: sticky;
+    top: 0.5rem;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+    margin: 0 -1.75rem 0.75rem;
+    padding: 0.5rem 1.75rem;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--color-border);
+    border-radius: 0;
+}
+
+.md-toolbar-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.1rem;
+}
+
+.md-sep {
+    width: 1px;
+    height: 20px;
+    background: var(--color-border);
+    margin: 0 0.4rem;
+}
+
+.md-spacer {
+    flex: 1 1 auto;
+}
+
+/* 按钮 */
+.md-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 30px;
+    padding: 0 0.4rem;
+    border: none;
+    background: transparent;
+    border-radius: 0.4rem;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    font-size: 0.85rem;
+    line-height: 1;
+    transition: background-color 150ms ease, color 150ms ease, transform 120ms ease;
+}
+.md-btn:hover {
+    background: var(--color-surface);
+    color: var(--color-text);
+}
+.md-btn:active {
+    transform: scale(0.92);
+}
+.md-btn.active {
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+}
+.md-btn.md-text {
+    font-weight: 700;
+    font-family: var(--font-sans);
+}
+.md-btn svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+/* Tooltip */
+.md-btn[data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    background: var(--color-text);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 400;
+    padding: 0.3rem 0.55rem;
+    border-radius: 0.4rem;
+    pointer-events: none;
+    z-index: 60;
+    opacity: 0;
+    animation: tip-in 120ms ease forwards;
+}
+.md-btn[data-tip]:hover::before {
+    content: '';
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-bottom-color: var(--color-text);
+    pointer-events: none;
+    z-index: 60;
+}
+@keyframes tip-in {
+    to { opacity: 1; }
+}
+
+/* 视图切换 */
+.md-viewtoggle {
+    display: inline-flex;
+    align-items: center;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    padding: 2px;
+    gap: 2px;
+}
+.md-viewtoggle button {
+    border: none;
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 0.78rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.35rem;
+    cursor: pointer;
+    transition: background-color 150ms ease, color 150ms ease;
+}
+.md-viewtoggle button:hover {
+    color: var(--color-text);
+}
+.md-viewtoggle button.active {
+    background: #fff;
+    color: var(--color-primary);
+    box-shadow: 0 1px 2px rgba(44, 42, 40, 0.08);
+}
+
+/* 编辑区布局：编辑 / 分屏 / 预览 */
+.editor-body {
+    display: block;
+}
+.editor-body.split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+}
+.editor-body.split .editor-textarea {
+    border-right: 1px solid var(--color-border);
+    padding-right: 1.25rem;
+}
+.editor-body.edit .md-preview {
+    display: none;
+}
+.editor-body.preview .editor-textarea {
+    display: none;
+}
+@media (max-width: 640px) {
+    .editor-body.split {
+        grid-template-columns: 1fr;
+    }
+    .editor-body.split .editor-textarea {
+        border-right: none;
+        padding-right: 0;
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: 1.25rem;
+    }
+}
+
+/* 预览区 */
+.md-preview {
+    padding: 0.25rem 0.25rem 1rem;
+    overflow-wrap: break-word;
+    color: var(--color-text);
+    line-height: 1.8;
+    min-height: 600px;
+}
+.md-pre-fallback {
+    white-space: pre-wrap;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+}
+
+/* Markdown 渲染排版（预览 + 文章详情页共用 .article-content） */
+.md-preview,
+.article-content {
+    font-size: 1rem;
+}
+.md-preview h1,
+.article-content h1 {
+    font-size: 1.7rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 1.4rem 0 0.7rem;
+}
+.md-preview h2,
+.article-content h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 1.3rem 0 0.6rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--color-border);
+}
+.md-preview h3,
+.article-content h3 {
+    font-size: 1.18rem;
+    font-weight: 600;
+    margin: 1.1rem 0 0.5rem;
+}
+.md-preview h4,
+.article-content h4 {
+    font-size: 1.02rem;
+    font-weight: 600;
+    margin: 1rem 0 0.5rem;
+}
+.md-preview p,
+.article-content p {
+    margin: 0.7rem 0;
+}
+.md-preview ul,
+.article-content ul {
+    list-style: disc;
+    padding-left: 1.5rem;
+    margin: 0.7rem 0;
+}
+.md-preview ol,
+.article-content ol {
+    list-style: decimal;
+    padding-left: 1.5rem;
+    margin: 0.7rem 0;
+}
+.md-preview li,
+.article-content li {
+    margin: 0.3rem 0;
+}
+.md-preview li.task-list-item,
+.article-content li.task-list-item {
+    list-style: none;
+    margin-left: -1.3rem;
+}
+.md-preview blockquote,
+.article-content blockquote {
+    border-left: 3px solid var(--color-primary);
+    padding: 0.4rem 1rem;
+    margin: 0.9rem 0;
+    color: var(--color-text-secondary);
+    background: var(--color-surface);
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+.md-preview code,
+.article-content code {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    padding: 0.12rem 0.36rem;
+    border-radius: 0.3rem;
+    font-size: 0.85em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.md-preview pre,
+.article-content pre {
+    background: #2C2A28;
+    color: #FDFCFA;
+    padding: 1rem 1.1rem;
+    border-radius: 0.6rem;
+    overflow: auto;
+    margin: 0.9rem 0;
+}
+.md-preview pre code,
+.article-content pre code {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font-size: 0.85rem;
+}
+.md-preview a,
+.article-content a {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.md-preview a:hover,
+.article-content a:hover {
+    color: var(--color-primary-hover);
+}
+.md-preview img,
+.article-content img {
+    max-width: 100%;
+    border-radius: 0.5rem;
+    margin: 0.7rem 0;
+}
+.md-preview hr,
+.article-content hr {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 1.4rem 0;
+}
+.md-preview table,
+.article-content table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.9rem 0;
+    font-size: 0.9rem;
+    overflow: hidden;
+    border-radius: 0.5rem;
+}
+.md-preview th,
+.md-preview td,
+.article-content th,
+.article-content td {
+    border: 1px solid var(--color-border);
+    padding: 0.55rem 0.8rem;
+    text-align: left;
+}
+.md-preview th,
+.article-content th {
+    background: var(--color-surface);
+    font-weight: 600;
+}
