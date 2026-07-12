@@ -175,7 +175,7 @@ class NoteController extends Controller
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
             'slug' => 'nullable|string|max:255',
-            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:10240',
             'remove_cover' => 'nullable|boolean',
         ]);
 
@@ -241,7 +241,7 @@ class NoteController extends Controller
     public function uploadImage(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'image' => 'required|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp,gif|max:10240',
         ]);
 
         if ($validator->fails()) {
@@ -264,7 +264,7 @@ class NoteController extends Controller
         $this->authorize('update', $note);
 
         $validator = Validator::make($request->all(), [
-            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:10240',
             'remove_cover' => 'nullable|boolean',
         ]);
 

@@ -22,7 +22,7 @@ class UpdateNoteRequest extends FormRequest
             'tags.*' => 'exists:tags,id',
             'status' => 'nullable|in:draft,published,archived',
             'slug' => 'nullable|string|max:255',
-            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:10240',
             'remove_cover' => 'nullable|boolean',
         ];
     }
