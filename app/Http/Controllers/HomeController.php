@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Note;
 use App\Models\Category;
 use App\Models\Tag;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class HomeController extends Controller
@@ -14,14 +15,21 @@ class HomeController extends Controller
      */
     public function index(): View
     {
-        $notes = Note::published()
-            ->with('tags', 'category')
-            ->latest()
-            ->take(6)
-            ->get();
+        $notes = Cache::remember('home.notes', 300, function () {
+            return Note::published()
+                ->with('tags', 'category')
+                ->latest()
+                ->take(6)
+                ->get();
+        });
 
-        $categories = Category::withCount('notes')->get();
-        $tags = Tag::withCount('notes')->get();
+        $categories = Cache::remember('home.categories', 600, function () {
+            return Category::withCount('notes')->get();
+        });
+
+        $tags = Cache::remember('home.tags', 600, function () {
+            return Tag::withCount('notes')->get();
+        });
 
         return view('home', compact('notes', 'categories', 'tags'));
     }

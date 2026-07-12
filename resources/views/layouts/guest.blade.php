@@ -21,7 +21,6 @@
         </script>
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-        <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}">
     </head>
     <body class="font-sans antialiased text-text bg-bg min-h-screen">
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-8 sm:pt-0 pb-8 px-4">

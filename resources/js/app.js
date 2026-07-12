@@ -1,11 +1,27 @@
 import Alpine from 'alpinejs';
+import Prism from 'prismjs';
+
+// 常用语法高亮语言
+import 'prismjs/components/prism-markup';
+import 'prismjs/components/prism-css';
+import 'prismjs/components/prism-clike';
+import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-php';
+import 'prismjs/components/prism-sql';
+import 'prismjs/components/prism-bash';
+import 'prismjs/components/prism-json';
+import 'prismjs/components/prism-yaml';
+import 'prismjs/components/prism-python';
 
 window.Alpine = Alpine;
 
 Alpine.start();
 
-// 主题切换
+// 主题切换 + 代码高亮
 document.addEventListener('DOMContentLoaded', function() {
+    // Prism 代码语法高亮
+    Prism.highlightAll();
+
     var toggle = document.getElementById('theme-toggle');
     if (!toggle) return;
 

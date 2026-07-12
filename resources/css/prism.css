@@ -1,0 +1,60 @@
+/* Prism.js 语法高亮主题 - 基于 tomorrow night 适配项目配色 */
+@import 'prismjs/themes/prism-tomorrow.css';
+
+/* 覆盖以匹配项目的 primary 色系 */
+pre[class*="language-"],
+code[class*="language-"] {
+    background: var(--color-surface-2, #1e1e2e) !important;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+}
+
+code[class*="language-"] {
+    padding: 0.2em 0.4em;
+    border-radius: 0.375rem;
+}
+
+pre[class*="language-"] {
+    padding: 1.25rem 1.5rem;
+    margin: 1.25rem 0;
+    overflow-x: auto;
+    border: 1px solid var(--color-border, #e5e5e5);
+}
+
+/* 暗黑模式适配 */
+.dark pre[class*="language-"],
+.dark code[class*="language-"] {
+    background: var(--color-surface-2, #181825) !important;
+    border-color: var(--color-border, #313244);
+}
+
+/* token 颜色微调 - 匹配 sage/primary 体系 */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata { color: #6c7086; }
+.token.punctuation { color: #9399b9; }
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted { color: #f38ba8; }
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted { color: #a6e3a1; }
+.token.operator,
+.token.entity,
+.token.url { color: #94e2d5; }
+.token.atrule,
+.token.attr-value,
+.token.keyword { color: #cba6f7; }
+.token.function,
+.token.class-name { color: #89b4fa; }
+.token.regex,
+.token.important,
+.token.variable { color: #fab387; }

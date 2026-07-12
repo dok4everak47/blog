@@ -6,6 +6,10 @@ $seoDescription = $note->excerpt
     ?? \App\Models\Note::generateExcerpt($note->content, 160);
 $ogImage = $note->cover_image_url
     ?? (preg_match('/!\[.*?\]\(([^)]+)\)/', $note->content ?? '', $m) ? $m[1] : null);
+// 阅读时间估算：中文约 300 字/分钟，英文约 200 词/分钟
+$textOnly = preg_replace('/[#*`\[\]()!>|\-{}]/', '', strip_tags($note->content ?? ''));
+$charCount = mb_strlen($textOnly);
+$readTime = max(1, (int) ceil($charCount / 300));
 @endphp
 
 @section('seo')
@@ -31,7 +35,11 @@ $ogImage = $note->cover_image_url
 @endsection
 
 @section('content')
-  <main class="max-w-2xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+    <div class="flex gap-10">
+
+      {{-- ====== 左侧文章主体 ====== --}}
+      <div class="flex-1 min-w-0 max-w-none lg:max-w-[780px]">
     <article>
       <p class="text-xs font-medium tracking-[0.2em] text-primary uppercase mb-4">文章</p>
 
@@ -55,6 +63,13 @@ $ogImage = $note->cover_image_url
           <span class="text-border-strong">·</span>
           <span class="text-primary">{{ $note->category->name }}</span>
         @endif
+        <span class="text-border-strong">·</span>
+        <span class="inline-flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.25 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+          </svg>
+          约 {{ $readTime }} 分钟阅读
+        </span>
       </div>
 
       <div class="border-t border-border pt-8">
@@ -67,6 +82,21 @@ $ogImage = $note->cover_image_url
         </div>
       </div>
     </article>
+
+    {{-- ====== 右侧目录导航 ====== --}}
+    <aside class="hidden lg:block w-52 shrink-0">
+      <div class="sticky top-24">
+        <p class="text-xs font-medium tracking-[0.15em] text-text-muted uppercase mb-4">目录</p>
+        <nav id="article-toc" class="space-y-1">
+          {{-- 由 JS 动态生成 --}}
+        </nav>
+      </div>
+    </aside>
+
+  </div>
+
+  {{-- 以下区域仍在左侧视觉流中（flex 布局下 aside 占位后自然换行） --}}
+  <div class="-mt-10 max-w-none lg:max-w-[780px]">
 
     @if ($note->tags->isNotEmpty())
       <div class="mt-8 flex flex-wrap gap-2">
@@ -223,5 +253,76 @@ $ogImage = $note->cover_image_url
         </form>
       @endauth
     </div>
+  </div>
+
   </main>
 @endsection
+
+{{-- 动态生成 TOC + 滚动高亮 --}}
+@push('scripts')
+<script>
+(function() {
+    var tocContainer = document.getElementById('article-toc');
+    if (!tocContainer) return;
+    var article = document.querySelector('.article-content');
+    if (!article) return;
+
+    var headings = article.querySelectorAll('h2, h3');
+    var iconMap = { H2: '◆', H3: '└' };
+    // 给每个标题加 id
+    headings.forEach(function(h, i) {
+        if (!h.id) {
+            h.id = 'heading-' + i;
+        }
+        var a = document.createElement('a');
+        a.href = '#' + h.id;
+        a.dataset.target = h.id;
+        a.className = 'flex items-center gap-2.5 text-sm py-2 px-3 rounded-lg border-l-[3px] border-transparent text-text-secondary hover:text-text hover:border-border-strong hover:bg-surface-2 transition';
+        a.innerHTML = '<span>' + (iconMap[h.tagName] || '·') + '</span> ' + h.textContent.trim();
+        tocContainer.appendChild(a);
+    });
+
+    // 点击高亮
+    tocContainer.querySelectorAll('a').forEach(function(a) {
+        a.addEventListener('click', function(e) {
+            e.preventDefault();
+            var target = document.getElementById(this.dataset.target);
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            tocContainer.querySelectorAll('a').forEach(function(el) {
+                el.classList.remove('border-primary', 'bg-primary-light/40', 'text-primary', 'font-medium');
+                el.classList.add('border-transparent');
+            });
+            this.classList.add('border-primary', 'bg-primary-light/40', 'text-primary', 'font-medium');
+            this.classList.remove('border-transparent');
+        });
+    });
+
+    // 滚动时自动高亮当前章节
+    if (headings.length === 0) return;
+    var activeHeading = headings[0];
+    function updateActive() {
+        var scrollTop = window.scrollY + 120; // offset
+        var current = null;
+        headings.forEach(function(h) {
+            if (h.offsetTop <= scrollTop) current = h;
+        });
+        if (current && current !== activeHeading) {
+            activeHeading = current;
+            tocContainer.querySelectorAll('a').forEach(function(el) {
+                el.classList.remove('border-primary', 'bg-primary-light/40', 'text-primary', 'font-medium');
+                el.classList.add('border-transparent');
+            });
+            var activeLink = tocContainer.querySelector('a[data-target="' + current.id + '"]');
+            if (activeLink) {
+                activeLink.classList.add('border-primary', 'bg-primary-light/40', 'text-primary', 'font-medium');
+                activeLink.classList.remove('border-transparent');
+            }
+        }
+    }
+    window.addEventListener('scroll', updateActive, { passive: true });
+    // 初始化第一个为高亮
+    var firstLink = tocContainer.querySelector('a');
+    if (firstLink) firstLink.click();
+})();
+</script>
+@endpush

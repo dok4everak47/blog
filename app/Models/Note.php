@@ -13,7 +13,9 @@ class Note extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'content', 'category_id', 'status', 'slug', 'cover_image', 'thumbnail_url', 'excerpt'];
+    protected $fillable = ['title', 'content', 'category_id', 'user_id', 'status', 'slug', 'cover_image', 'thumbnail_url', 'excerpt'];
+
+    protected $with = ['category', 'user'];
 
     protected function casts(): array
     {
@@ -85,7 +87,7 @@ class Note extends Model
 
     public function tags()
     {
-        return $this->belongsToMany(Tag::class);
+        return $this->belongsToMany(Tag::class)->withTimestamps();
     }
 
     public function category()
