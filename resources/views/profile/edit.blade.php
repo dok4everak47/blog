@@ -8,7 +8,7 @@
         </div>
     </x-slot>
 
-    <div class="py-10 sm:py-16 bg-bg">
+    <div class="pb-10 sm:pb-16 pt-2 bg-bg">
         <div class="max-w-6xl mx-auto px-4 sm:px-6">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
             <div class="p-6 sm:p-8 bg-surface-2 border border-border rounded-2xl">
