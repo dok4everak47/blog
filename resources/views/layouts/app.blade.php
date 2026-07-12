@@ -5,14 +5,14 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ $title ?? config('app.name', 'Laravel') }}</title>
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased text-text bg-bg min-h-screen">
-        <div class="min-h-screen">
-            @include('layouts.navigation')
+    <body class="font-sans antialiased text-text bg-bg min-h-screen flex flex-col">
+        <x-nav />
 
+        <main class="flex-1">
             @isset($header)
                 <header class="bg-white border-b border-border">
                     <div class="max-w-6xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
@@ -21,9 +21,9 @@
                 </header>
             @endisset
 
-            <main>
-                {{ $slot }}
-            </main>
-        </div>
+            {{ $slot }}
+        </main>
+
+        <x-footer />
     </body>
 </html>
