@@ -95,6 +95,11 @@ Route::middleware('auth')->group(function () {
         ->middleware('throttle:30,1')
         ->name('notes.upload-image');
 
+    // 编辑器内联快速创建标签
+    Route::post('/tags', [TagController::class, 'store'])
+        ->middleware('throttle:30,1')
+        ->name('tags.store');
+
     // 个人资料
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

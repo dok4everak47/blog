@@ -18,6 +18,10 @@
             newCategoryName: '',
             catSaving: false,
 
+            // 新建标签
+            newTagName: '',
+            tagCreating: false,
+
             // 封面图
             coverPreview: null,
             coverChanged: false,
@@ -621,6 +625,58 @@
             clearTags() {
                 this.selectedTags = [];
                 this.dirty = true;
+            },
+
+            // 快速创建新标签
+            async createTag() {
+                const name = (this.newTagName || '').trim();
+                if (!name || this.tagCreating) return;
+                // 已存在则直接选中
+                const existing = this.allTags.find(t => t.name.toLowerCase() === name.toLowerCase());
+                if (existing) {
+                    if (!this.selectedTags.includes(existing.id)) {
+                        this.selectedTags.push(existing.id);
+                        this.dirty = true;
+                    }
+                    this.newTagName = '';
+                    return;
+                }
+                this.tagCreating = true;
+                this.errors = [];
+                const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
+                const url = this.$root.dataset.createTagUrl;
+                if (!url) {
+                    this.errors = ['系统错误：缺少标签创建地址'];
+                    this.tagCreating = false;
+                    return;
+                }
+                try {
+                    const res = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token,
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: JSON.stringify({ name }),
+                    });
+                    const data = await res.json();
+                    if (!res.ok || !data.id) {
+                        this.errors = data.errors ? Object.values(data.errors).flat() : ['创建标签失败，请重试'];
+                        this.tagCreating = false;
+                        return;
+                    }
+                    // 插入到 allTags 头部
+                    this.allTags.unshift({ id: data.id, name: data.name });
+                    this.selectedTags.push(data.id);
+                    this.newTagName = '';
+                    this.dirty = true;
+                } catch (e) {
+                    this.errors = ['创建标签失败，请重试'];
+                } finally {
+                    this.tagCreating = false;
+                }
             },
 
             slugify(text) {

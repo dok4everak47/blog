@@ -19,6 +19,7 @@
        data-initial-cover="{{ $note->cover_image_url ?? '' }}"
        data-autosave-url="{{ route('notes.autosave') }}"
        data-update-url="{{ route('notes.update', '__ID__') }}"
+       data-create-tag-url="{{ route('tags.store') }}"
        data-upload-image-url="{{ route('notes.upload-image') }}">
 
     <main class="max-w-4xl mx-auto px-4 sm:px-6 pt-6 pb-28">
@@ -116,7 +117,7 @@
         {{-- 标签 --}}
         <div class="mt-6">
           <label class="block text-sm font-medium text-text mb-3">标签</label>
-          <div class="flex flex-wrap gap-2">
+          <div class="flex flex-wrap gap-2 mb-3">
             <template x-for="tag in allTags" :key="tag.id">
               <button type="button" class="tag-chip"
                       :class="{ 'active': selectedTags.includes(tag.id) }"
@@ -124,6 +125,24 @@
                       x-text="tag.name"></button>
             </template>
           </div>
+
+          {{-- 新建标签 --}}
+          <div class="flex items-center gap-2">
+            <input type="text"
+                   x-model="newTagName"
+                   @keydown.enter.prevent="createTag()"
+                   placeholder="输入新标签后回车"
+                   maxlength="30"
+                   class="flex-1 px-3 py-1.5 text-sm border border-border rounded-lg bg-bg text-text focus:outline-none focus:border-primary transition">
+            <button type="button"
+                    @click="createTag()"
+                    :disabled="!newTagName.trim() || tagCreating"
+                    class="px-3 py-1.5 text-sm rounded-lg border border-border text-text-secondary hover:text-primary hover:border-primary transition disabled:opacity-50 disabled:cursor-not-allowed">
+              <span x-show="!tagCreating">添加</span>
+              <span x-show="tagCreating" x-cloak>添加中...</span>
+            </button>
+          </div>
+
           <div x-ref="tagInputs"></div>
         </div>
 
