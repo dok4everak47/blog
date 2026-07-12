@@ -70,6 +70,54 @@
                 </div>
             </div>
 
+            {{-- 站点设置：Hero 背景图 --}}
+            <div class="rounded-2xl border border-border bg-white p-6 sm:p-8" x-data="heroImageManager({{ Illuminate\Support\Js::from($heroImage) }})">
+                <p class="text-xs font-medium tracking-[0.2em] text-primary uppercase mb-4">站点设置</p>
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    {{-- 当前 Hero 背景图预览 --}}
+                    <div class="relative w-full sm:w-48 h-28 rounded-xl overflow-hidden border border-border shrink-0 bg-surface-2">
+                        <template x-if="currentUrl">
+                            <img :src="currentUrl" alt="Hero 背景图" class="w-full h-full object-cover">
+                        </template>
+                        <template x-if="!currentUrl">
+                            <div class="w-full h-full flex items-center justify-center text-text-muted text-xs">
+                                未设置（自动取最新文章）
+                            </div>
+                        </template>
+                    </div>
+
+                    {{-- 操作区 --}}
+                    <div class="flex-1 space-y-3 w-full">
+                        <p class="text-sm text-text-secondary">
+                            首页全屏 Hero 区域的背景图。不设置时自动使用最新文章的封面图。
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <input type="file" accept="image/*" class="hidden" x-ref="heroFile"
+                                   @change="onFileChange($event)">
+                            <button type="button"
+                                    class="px-4 py-2 rounded-lg bg-primary text-sm font-medium text-white hover:bg-primary-hover transition disabled:opacity-50"
+                                    :disabled="uploading"
+                                    @click="$refs.heroFile.click()">
+                                <span x-show="!uploading">上传背景图</span>
+                                <span x-show="uploading" x-cloak>上传中…</span>
+                            </button>
+                            <button type="button"
+                                    class="px-4 py-2 rounded-lg border border-border text-sm font-medium text-text hover:bg-surface transition"
+                                    x-show="currentUrl"
+                                    @click="remove()">
+                                移除
+                            </button>
+                        </div>
+                        <template x-if="error">
+                            <p class="text-xs text-red-600" x-text="error"></p>
+                        </template>
+                        <template x-if="success">
+                            <p class="text-xs text-green-600" x-text="success"></p>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
             {{-- Recent Notes --}}
             <div class="rounded-2xl border border-border bg-white p-6 sm:p-8" x-data="coverManager()" x-cloak>
                 <p class="text-xs font-medium tracking-[0.2em] text-primary uppercase mb-4">最近文章</p>
@@ -290,5 +338,103 @@
                 },
             };
         };
+
+        window.heroImageManager = function (initialUrl) {
+            return {
+                currentUrl: initialUrl || null,
+                file: null,
+                uploading: false,
+                error: null,
+                success: null,
+
+                onFileChange(e) {
+                    const f = e.target.files && e.target.files[0];
+                    if (!f) return;
+                    // 预览
+                    if (this.currentUrl && this.currentUrl.startsWith('blob:')) {
+                        URL.revokeObjectURL(this.currentUrl);
+                    }
+                    this.currentUrl = URL.createObjectURL(f);
+                    this.file = f;
+                    this.error = null;
+                    this.success = null;
+                    // 自动上传
+                    this.save();
+                },
+
+                async remove() {
+                    this.uploading = true;
+                    this.error = null;
+                    this.success = null;
+                    const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
+                    try {
+                        const res = await fetch('/settings/hero-image', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': token,
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                            body: JSON.stringify({ remove: true }),
+                        });
+                        if (!res.ok) throw new Error();
+                        this.currentUrl = null;
+                        this.success = '已移除';
+                        setTimeout(() => { this.success = null; }, 3000);
+                    } catch (e) {
+                        this.error = '移除失败，请重试';
+                    } finally {
+                        this.uploading = false;
+                    }
+                },
+
+                async save() {
+                    if (!this.file) return;
+                    this.uploading = true;
+                    this.error = null;
+                    this.success = null;
+                    const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
+                    const fd = new FormData();
+                    fd.append('image', this.file);
+                    try {
+                        const res = await fetch('/settings/hero-image', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': token,
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                            body: fd,
+                        });
+                        if (!res.ok) {
+                            const data = await res.json().catch(() => ({}));
+                            const msg = data.message || ('errors' in data ? Object.values(data.errors).flat()[0] : '上传失败');
+                            this.error = msg;
+                            return;
+                        }
+                        const data = await res.json();
+                        // 切换 blob 预览为真实 URL
+                        if (this.currentUrl && this.currentUrl.startsWith('blob:')) {
+                            URL.revokeObjectURL(this.currentUrl);
+                        }
+                        this.currentUrl = data.url;
+                        this.file = null;
+                        this.success = data.message || '更新成功';
+                        setTimeout(() => { this.success = null; }, 3000);
+                    } catch (e) {
+                        this.error = '上传失败，请重试';
+                    } finally {
+                        this.uploading = false;
+                    }
+                },
+            };
+        };
+
+        // 上传按钮自动触发保存（与 x-data 内联）
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[x-data*="heroImageManager"]').forEach(el => {
+                // Alpine 会处理，无需额外绑定
+            });
+        });
     </script>
 </x-app-layout>

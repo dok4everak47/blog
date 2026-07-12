@@ -8,9 +8,9 @@
   {{-- 背景图层 --}}
   <div class="hero-bg">
     @php
-      // 优先取最新文章的封面图/正文首图作为 hero 背景
-      $heroImage = null;
-      if ($notes->isNotEmpty()) {
+      // 优先使用手动设置的 Hero 背景图，否则取最新文章的封面/正文首图
+      $heroImage = \App\Models\SiteSetting::get('hero_image');
+      if (!$heroImage && $notes->isNotEmpty()) {
         $latest = $notes->first();
         $heroImage = $latest->cover_image_url;
         if (!$heroImage && $latest->content) {

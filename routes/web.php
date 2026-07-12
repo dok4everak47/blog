@@ -49,6 +49,11 @@ Route::middleware('auth')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // 首页 Hero 背景图设置
+    Route::post('/settings/hero-image', [DashboardController::class, 'updateHeroImage'])
+        ->middleware('throttle:30,1')
+        ->name('settings.hero-image');
+
     // 文章管理
     Route::get('/notes/create', [NoteController::class, 'create'])->name('notes.create');
     Route::post('/notes', [NoteController::class, 'store'])->name('notes.store');
