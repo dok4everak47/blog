@@ -55,7 +55,8 @@ $readTime = max(1, (int) ceil($charCount / 300));
       <div class="flex flex-wrap items-center gap-3 mb-8 text-sm text-text-secondary">
         <span class="inline-flex items-center gap-1">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6l4 2m6-2A10 10 0 1 1 4.5 18.5"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 2v3M16 2v3M3.5 9h17M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/>
           </svg>
           {{ $note->created_at->format('Y-m-d') }}
         </span>
@@ -243,7 +244,7 @@ $readTime = max(1, (int) ceil($charCount / 300));
       </section>
     @endif
 
-    <div class="mt-10 flex flex-wrap items-center gap-4 text-sm pt-8 border-t border-border">
+    <div class="mt-10 flex flex-wrap items-center gap-4 text-sm font-medium pt-8 border-t border-border">
       <a href="{{ route('home') }}" class="text-text-secondary hover:text-primary transition">← 回首页</a>
       @auth
         <a href="{{ route('notes.edit', $note) }}" class="text-primary hover:text-primary-hover transition">编辑</a>
