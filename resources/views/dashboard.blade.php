@@ -120,6 +120,94 @@
                 </template>
             </div>
 
+            {{-- 站点设置：About 页面内容 --}}
+            <div class="rounded-2xl border border-border bg-surface-2 p-5 sm:p-6" x-data="aboutEditor({{ Illuminate\Support\Js::from($aboutContent) }})">
+                <div class="flex items-center justify-between mb-5">
+                    <div>
+                        <p class="text-sm font-medium text-text">About 页面内容</p>
+                        <p class="text-xs text-text-secondary mt-0.5">编辑「关于」页面的个人信息和介绍文字</p>
+                    </div>
+                    <a href="{{ route('about') }}" target="_blank" class="text-xs text-primary hover:text-primary-hover transition flex items-center gap-1">
+                        预览页面
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                </div>
+
+                {{-- 开场白 --}}
+                <div class="mb-5">
+                    <label class="block text-xs font-medium text-text-secondary mb-1.5">开场白</label>
+                    <textarea x-model="data.greeting" rows="2" placeholder="hello，很高兴遇见你…"
+                              class="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 resize-y"></textarea>
+                </div>
+
+                {{-- 自我介绍（可增删行） --}}
+                <div class="mb-5">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-xs font-medium text-text-secondary">自我介绍条目</label>
+                        <button type="button" @click="addSelfItem()" class="text-xs text-primary hover:text-primary-hover transition">+ 添加条目</button>
+                    </div>
+                    <div class="space-y-2">
+                        <template x-for="(item, index) in data.self" :key="index">
+                            <div class="flex gap-2">
+                                <select :x-model="`data.self[${index}].icon`" class="w-20 shrink-0 rounded-lg border border-border bg-surface px-2 py-2 text-base text-center outline-none focus:border-primary">
+                                    <option value="">👋</option><option value="🎓">🎓</option><option value="🌍">🌍</option><option value="🌱">🌱</option><option value="🏷️">🏷️</option><option value="💼">💼</option><option value="🎮">🎮</option><option value="☕">☕</option><option value="📚">📚</option><option value="🎵">🎵</option>
+                                </select>
+                                <input :x-model="`data.self[${index}].label`" type="text" placeholder="标签（如：称呼）"
+                                       class="w-24 shrink-0 rounded-lg border border-border bg-surface px-2.5 py-2 text-sm outline-none focus:border-primary">
+                                <input :x-model="`data.self[${index}].value`" type="text" placeholder="内容（如：Dok4ever）"
+                                       class="flex-1 min-w-0 rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary">
+                                <button type="button" @click="removeSelfItem(index)" class="shrink-0 p-2 text-text-muted hover:text-red-500 transition" x-show="data.self.length > 1">✕</button>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                {{-- 技术栈 / 兴趣 --}}
+                <div class="mb-5">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-xs font-medium text-text-secondary">技术 & 兴趣</label>
+                        <button type="button" @click="addTechItem()" class="text-xs text-primary hover:text-primary-hover transition">+ 添加条目</button>
+                    </div>
+                    <div class="space-y-2">
+                        <template x-for="(item, index) in data.tech" :key="'t'+index">
+                            <div class="flex gap-2">
+                                <input :x-model="`data.tech[${index}].label`" type="text" placeholder="标题（如：后端框架）"
+                                       class="w-28 shrink-0 rounded-lg border border-border bg-surface px-2.5 py-2 text-sm outline-none focus:border-primary">
+                                <input :x-model="`data.tech[${index}].value`" type="text" placeholder="内容（如：Laravel 13）"
+                                       class="flex-1 min-w-0 rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary">
+                                <button type="button" @click="removeTechItem(index)" class="shrink-0 p-2 text-text-muted hover:text-red-500 transition" x-show="data.tech.length > 1">✕</button>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                {{-- 联系信息 --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+                    <div>
+                        <label class="block text-xs font-medium text-text-secondary mb-1.5">联系说明</label>
+                        <textarea x-model="data.contact_intro" rows="3" placeholder="如果想交换友链…&#10;和我临时聊天可以去留言板…"
+                                  class="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 resize-y"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-text-secondary mb-1.5">联系邮箱</label>
+                        <input x-model="data.email" type="email" placeholder="your@email.com"
+                               class="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/10">
+                    </div>
+                </div>
+
+                {{-- 操作栏 --}}
+                <div class="flex items-center gap-3 pt-3 border-t border-border">
+                    <button type="button" @click="save()" :disabled="saving"
+                            class="px-5 py-2 rounded-lg bg-primary text-sm font-medium text-white hover:bg-primary-hover transition disabled:opacity-50">
+                        <span x-show="!saving">保存修改</span>
+                        <span x-show="saving" x-cloak>保存中…</span>
+                    </button>
+                    <template x-if="msg">
+                        <p class="text-xs" :class="msgType === 'error' ? 'text-red-600' : 'text-green-600'" x-text="msg"></p>
+                    </template>
+                </div>
+            </div>
+
             {{-- Recent Notes --}}
             <div class="rounded-2xl border border-border bg-surface-2 p-6 sm:p-8" x-data="coverManager()" x-cloak>
                 <p class="text-xs font-medium tracking-[0.2em] text-primary uppercase mb-4">最近文章</p>
@@ -444,5 +532,61 @@
                 // Alpine 会处理，无需额外绑定
             });
         });
+
+        window.aboutEditor = function (initialData) {
+            return {
+                data: initialData || {
+                    greeting: '',
+                    self: [{ icon: '👋', label: '', value: '' }],
+                    tech: [{ label: '', value: '' }],
+                    contact_intro: '',
+                    email: '',
+                },
+                saving: false,
+                msg: null,
+                msgType: '',
+
+                addSelfItem() {
+                    this.data.self.push({ icon: '👋', label: '', value: '' });
+                },
+                removeSelfItem(index) {
+                    this.data.self.splice(index, 1);
+                },
+                addTechItem() {
+                    this.data.tech.push({ label: '', value: '' });
+                },
+                removeTechItem(index) {
+                    this.data.tech.splice(index, 1);
+                },
+
+                async save() {
+                    this.saving = true;
+                    this.msg = null;
+                    const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
+                    try {
+                        const res = await fetch('/settings/about-content', {
+                            method: 'POST',
+                            headers: { 'X-CSRF-TOKEN': token, 'Content-Type': 'application/json' },
+                            body: JSON.stringify(this.data),
+                        });
+                        if (!res.ok) {
+                            const d = await res.json().catch(() => ({}));
+                            this.msg = Object.values(d.errors || {}).flat().join('；') || '保存失败';
+                            this.msgType = 'error';
+                        } else {
+                            const d = await res.json();
+                            this.msg = d.message || '已保存';
+                            this.msgType = 'success';
+                            setTimeout(() => { this.msg = null; }, 3000);
+                        }
+                    } catch (e) {
+                        this.msg = '网络错误，请重试';
+                        this.msgType = 'error';
+                    } finally {
+                        this.saving = false;
+                    }
+                },
+            };
+        };
     </script>
 </x-app-layout>

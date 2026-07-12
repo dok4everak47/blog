@@ -60,6 +60,13 @@ Route::middleware('auth')->group(function () {
         ->middleware('throttle:30,1')
         ->name('settings.hero-image');
 
+    // About 页面内容编辑
+    Route::get('/settings/about-content', [DashboardController::class, 'getAboutContent'])
+        ->name('settings.about-content.get');
+    Route::post('/settings/about-content', [DashboardController::class, 'updateAboutContent'])
+        ->middleware('throttle:30,1')
+        ->name('settings.about-content.update');
+
     // 文章管理
     Route::get('/notes/create', [NoteController::class, 'create'])->name('notes.create');
     Route::post('/notes', [NoteController::class, 'store'])->name('notes.store');

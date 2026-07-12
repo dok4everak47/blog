@@ -9,6 +9,15 @@
 @endsection
 
 @section('content')
+@php
+    $about = \App\Models\SiteSetting::get('about_content', []);
+    $greeting = $about['greeting'] ?? 'hello，很高兴遇见你，陌生人。相见即是幸运，那下面是关于我的一些介绍 😊';
+    $selfItems = $about['self'] ?? [];
+    $techItems = $about['tech'] ?? [];
+    $contactIntro = $about['contact_intro'] ?? "如有任何问题欢迎给我发邮件。";
+    $email = $about['email'] ?? '';
+@endphp
+
 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
   <div class="flex gap-10">
 
@@ -24,118 +33,78 @@
       </header>
 
       {{-- 开场白 --}}
+      @if($greeting)
       <section class="mb-10">
-        <p class="text-text-secondary leading-[1.85] text-[15px]">
-          hello，很高兴遇见你，陌生人。相见即是幸运，那下面是关于我的一些介绍 😊
-        </p>
+        <p class="text-text-secondary leading-[1.85] text-[15px]">{!! nl2br(e($greeting)) !!}</p>
       </section>
+      @endif
 
       {{-- 虚线分隔 --}}
       <hr class="border-dashed border-border my-10">
 
       {{-- 个人信息 --}}
-      <section class="mb-10">
+      @if(!empty($selfItems))
+      <section class="mb-10" id="self">
         <h2 class="text-xl font-bold text-text flex items-center gap-2 mb-6">
           <span class="text-primary">♦</span>
           关于·自我
         </h2>
 
         <div class="space-y-4">
-          {{-- 称呼 --}}
+          @foreach($selfItems as $item)
+          @if(!empty($item['value']))
           <div class="flex items-start gap-3">
-            <span class="shrink-0 mt-0.5">👋</span>
+            <span class="shrink-0 mt-0.5">{{ $item['icon'] ?? '' }}</span>
             <div class="leading-relaxed">
-              <span class="text-primary font-medium">称呼：</span>
-              <span class="text-text">你可以称我为 Dok4ever 或 4ever，当然也可以叫我别的~</span>
+              <span class="text-primary font-medium">{{ $item['label'] }}：</span>
+              <span class="text-text">{{ $item['value'] }}</span>
             </div>
           </div>
-
-          {{-- 身份 --}}
-          <div class="flex items-start gap-3">
-            <span class="shrink-0 mt-0.5">🎓</span>
-            <div class="leading-relaxed">
-              <span class="text-primary font-medium">身份：</span>
-              <span class="text-text">应届毕业生 / Laravel 学习者</span>
-            </div>
-          </div>
-
-          {{-- 坐标 --}}
-          <div class="flex items-start gap-3">
-            <span class="shrink-0 mt-0.5">🌍</span>
-            <div class="leading-relaxed">
-              <span class="text-primary font-medium">坐标：</span>
-              <span class="text-text">中国 · 广西</span>
-            </div>
-          </div>
-
-          {{-- 状态 --}}
-          <div class="flex items-start gap-3">
-            <span class="shrink-0 mt-0.5">🌱</span>
-            <div class="leading-relaxed">
-              <span class="text-primary font-medium">目前状态：</span>
-              <span class="text-text">正在从零学习 Laravel，用这个博客记录学习过程</span>
-            </div>
-          </div>
-
-          {{-- 标签 --}}
-          <div class="flex items-start gap-3">
-            <span class="shrink-0 mt-0.5">🏷️</span>
-            <div class="leading-relaxed">
-              <span class="text-primary font-medium">标签：</span>
-              <span class="text-text">Laravel 初学者 | PHP 新手 | 博客搭建中 | 技术爱好者 | 写作练习生</span>
-            </div>
-          </div>
+          @endif
+          @endforeach
         </div>
       </section>
+      @endif
 
       {{-- 虚线分隔 --}}
+      @if(!empty($techItems))
       <hr class="border-dashed border-border my-10">
 
       {{-- 技术栈 / 兴趣 --}}
-      <section class="mb-10">
+      <section class="mb-10" id="tech">
         <h2 class="text-xl font-bold text-text flex items-center gap-2 mb-6">
           <span class="text-primary">♦</span>
           技术·兴趣
         </h2>
 
         <div class="space-y-4">
+          @foreach($techItems as $item)
+          @if(!empty($item['value']))
           <div class="leading-relaxed">
-            <span class="text-primary font-medium">后端框架：</span>
-            <span class="text-text">Laravel 13（正在深入学习中～）</span>
+            <span class="text-primary font-medium">{{ $item['label'] }}：</span>
+            <span class="text-text">{!! nl2br(e($item['value'])) !!}</span>
           </div>
-          <div class="leading-relaxed">
-            <span class="text-primary font-medium">前端技术：</span>
-            <span class="text-text">Tailwind CSS v4 · Alpine.js · Vite</span>
-          </div>
-          <div class="leading-relaxed">
-            <span class="text-primary font-medium">语言基础：</span>
-            <span class="text-text">PHP 8.3 · 正在补齐 JavaScript 和 SQL</span>
-          </div>
-          <div class="leading-relaxed">
-            <span class="text-primary font-medium">其他兴趣：</span>
-            <span class="text-text">Agent 工程 · 强化学习研究 · 数据库自治方向探索</span>
-          </div>
-          <div class="leading-relaxed">
-            <span class="text-primary font-medium">目标：</span>
-            <span class="text-text">把 Laravel 学精，做出有个人风格的博客系统 ✨</span>
-          </div>
+          @endif
+          @endforeach
         </div>
       </section>
+      @endif
 
       {{-- 虚线分隔 --}}
       <hr class="border-dashed border-border my-10">
 
       {{-- 联系方式 --}}
-      <section class="mb-10">
+      <section class="mb-10" id="contact">
         <h2 class="text-xl font-bold text-text flex items-center gap-2 mb-6">
           <span class="text-primary">♦</span>
           关于·联系
         </h2>
 
         <div class="space-y-3 text-text-secondary leading-[1.85]">
-          <p>如果想交换友链可以去友链界面；</p>
-          <p>和我临时聊天可以去留言板；</p>
-          <p>如有任何问题欢迎给我发邮件（邮箱：<a href="mailto:girlsfrontline45@gmail.com" class="text-primary hover:text-primary-hover transition underline decoration-primary/30 hover:decoration-primary/60">girlsfrontline45@gmail.com</a>）。</p>
+          {!! nl2br(e($contactIntro)) !!}
+          @if($email)
+          <p>邮箱：<a href="mailto:{{ $email }}" class="text-primary hover:text-primary-hover transition underline decoration-primary/30 hover:decoration-primary/60">{{ $email }}</a></p>
+          @endif
         </div>
       </section>
 
@@ -168,7 +137,6 @@
       @if ($latestNote)
       <a href="{{ route('notes.show', $latestNote) }}"
          class="group block rounded-2xl overflow-hidden relative h-48 sm:h-56 hover:-translate-y-0.5 transition-transform duration-300">
-        {{-- 背景：用最新文章封面图或渐变兜底 --}}
         @if ($latestNote->thumbnail_url || $latestNote->cover_image_url)
           <img src="{{ $latestNote->thumbnail_url ?: $latestNote->cover_image_url }}"
                alt="" class="absolute inset-0 w-full h-full object-cover" loading="lazy">
@@ -196,10 +164,12 @@
              class="flex items-center gap-2.5 text-sm py-2 px-3 rounded-lg border-l-[3px] border-primary bg-primary-light/40 text-primary font-medium transition">
             <span>😊</span> 关于·自我
           </a>
+          @if(!empty($techItems))
           <a href="#tech"
              class="flex items-center gap-2.5 text-sm py-2 px-3 rounded-lg border-l-[3px] border-transparent text-text-secondary hover:text-text hover:border-border-strong hover:bg-surface-2 transition">
             <span>⚡</span> 技术·兴趣
           </a>
+          @endif
           <a href="#contact"
              class="flex items-center gap-2.5 text-sm py-2 px-3 rounded-lg border-l-[3px] border-transparent text-text-secondary hover:text-text hover:border-border-strong hover:bg-surface-2 transition">
             <span>💬</span> 关于·联系
