@@ -31,7 +31,7 @@
       {{-- Markdown 渲染内容 --}}
       @if($html)
       <article class="about-content text-[15px] leading-[1.85] text-text-secondary prose-custom">
-        {!! \Illuminate\Support\Str::purify($html) !!}
+        {!! $html !!}
       </article>
       @else
       <p class="text-text-muted italic py-8">暂无内容…</p>
