@@ -1,6 +1,13 @@
 @extends('layouts.blog')
 @section('title', '全部文章 · My Blog')
 
+@section('seo')
+<meta name="description" content="浏览全部文章 — {{ config('app.name', 'My Blog') }}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="全部文章">
+<meta property="og:url" content="{{ route('notes.index') }}">
+@endsection
+
 @section('content')
   <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
     {{-- 页头 --}}

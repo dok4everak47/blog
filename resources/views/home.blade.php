@@ -1,5 +1,17 @@
 @extends('layouts.blog')
-@section('title', 'My Blog')
+@section('title', 'My Blog — 记录生活与思考的每一刻')
+
+@section('seo')
+<meta name="description" content="{{ config('app.name', 'My Blog') }} — 个人博客，记录生活、技术与思考。分享文章、灵感与日常。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{ config('app.name', 'My Blog') }}">
+<meta property="og:description" content="个人博客，记录生活、技术与思考。">
+<meta property="og:url" content="{{ url('/') }}">
+<meta property="og:site_name" content="{{ config('app.name', 'My Blog') }}">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="{{ config('app.name', 'My Blog') }}">
+<meta name="twitter:description" content="个人博客，记录生活、技术与思考。">
+@endsection
 
 @section('content')
 

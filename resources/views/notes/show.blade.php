@@ -1,6 +1,39 @@
 @extends('layouts.blog')
 @section('title', ($note->title ?? '') . ' · My Blog')
 
+@php
+$seoDescription = \Illuminate\Support\Str::limit(
+    strip_tags(
+        preg_replace('/!\[.*?\]\([^)]+\)|\[.*?\]\([^)]+\)|`[^`]+`/', '', $note->content ?? '')
+    ),
+    160
+);
+$ogImage = $note->cover_image_url
+    ?? (preg_match('/!\[.*?\]\(([^)]+)\)/', $note->content ?? '', $m) ? $m[1] : null);
+@endphp
+
+@section('seo')
+<meta name="description" content="{{ $seoDescription }}">
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{ $note->title }}">
+<meta property="og:description" content="{{ $seoDescription }}">
+<meta property="og:url" content="{{ route('notes.show', $note) }}">
+@if($ogImage)
+<meta property="og:image" content="{{ url($ogImage) }}">
+@endif
+<meta property="og:site_name" content="{{ config('app.name', 'My Blog') }}">
+<meta property="article:published_time" content="{{ $note->created_at->toIso8601String() }}">
+@if($note->updated_at->gt($note->created_at))
+<meta property="article:modified_time" content="{{ $note->updated_at->toIso8601String() }}">
+@endif
+<meta name="twitter:card" content="{{ $ogImage ? 'summary_large_image' : 'summary' }}">
+<meta name="twitter:title" content="{{ $note->title }}">
+<meta name="twitter:description" content="{{ $seoDescription }}">
+@if($ogImage)
+<meta name="twitter:image" content="{{ url($ogImage) }}">
+@endif
+@endsection
+
 @section('content')
   <main class="max-w-2xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
     <article>

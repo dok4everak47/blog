@@ -1,6 +1,13 @@
 @extends('layouts.blog')
 @section('title', '分类：' . $category->name . ' · My Blog')
 
+@section('seo')
+<meta name="description" content="{{ $category->name }} 分类下的所有文章 — {{ config('app.name', 'My Blog') }}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="分类：{{ $category->name }}">
+<meta property="og:url" content="{{ route('categories.show', $category) }}">
+@endsection
+
 @section('content')
   <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
     {{-- 页头 --}}

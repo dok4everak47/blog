@@ -8,6 +8,11 @@
     {{-- 每页可通过 @section('title') 覆盖，默认用站点名 --}}
     <title>@yield('title', config('app.name', 'My Blog'))</title>
 
+    {{-- SEO Meta（子页面通过 @section('seo') 填充） --}}
+    @yield('seo')
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" content="{{ url()->current() }}">
+
     {{-- 主题切换：内联执行避免闪烁 --}}
     <script>
         (function() {
