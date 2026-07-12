@@ -73,10 +73,10 @@
             <div onclick="window.location.href='{{ route('notes.show', $note) }}'" class="grid grid-cols-1 md:grid-cols-5 cursor-pointer" role="link">
               {{-- Text --}}
               <div class="p-6 sm:p-8 md:col-span-3 flex flex-col justify-center">
-                <div class="flex items-center gap-2 text-xs text-text-muted mb-3">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                      d="M12 6v6l4 2m6-2A10 10 0 1 1 4.5 18.5" />
+                <div class="flex items-center gap-1.5 text-xs text-text-muted mb-3">
+                  <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M8 2v3M16 2v3M3.5 9h17M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" />
                   </svg>
                   <span>编辑于 {{ $note->created_at->format('Y-m-d') }}</span>
                 </div>
