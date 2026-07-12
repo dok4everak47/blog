@@ -69,19 +69,8 @@ export function openImageCropper(source, opts = {}) {
             overlay.remove();
         };
 
-        // 加载图片：支持 File/Blob 和远程 URL
-        if (source instanceof Blob) {
-            objectUrl = URL.createObjectURL(source);
-            imgEl.src = objectUrl;
-        } else if (typeof source === 'string' && source.trim()) {
-            imgEl.src = source;
-            imgEl.crossOrigin = 'anonymous';
-        } else {
-            reject(new Error('不支持的图片源'));
-            cleanup();
-            return;
-        }
-
+        // 先绑定 onload/onerror，再设置 src
+        // （Blob URL 加载极快，如果先设 src 再绑 onload，load 事件可能已经触发，回调永远不会被调用）
         imgEl.onload = () => {
             cropper = new Cropper(imgEl, {
                 aspectRatio,
@@ -104,6 +93,19 @@ export function openImageCropper(source, opts = {}) {
             reject(new Error('图片加载失败'));
             cleanup();
         };
+
+        // 加载图片：支持 File/Blob 和远程 URL
+        if (source instanceof Blob) {
+            objectUrl = URL.createObjectURL(source);
+            imgEl.src = objectUrl;
+        } else if (typeof source === 'string' && source.trim()) {
+            imgEl.crossOrigin = 'anonymous';
+            imgEl.src = source;
+        } else {
+            reject(new Error('不支持的图片源'));
+            cleanup();
+            return;
+        }
 
         // 宽高比按钮
         ratioBtns.forEach(btn => {
