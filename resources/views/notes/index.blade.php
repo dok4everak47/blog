@@ -14,65 +14,81 @@
 
     {{-- 文章列表 --}}
     @forelse ($notes as $note)
-      <article class="group rounded-2xl border border-border bg-surface-2 overflow-hidden hover:border-border-strong hover:shadow-sm transition-all duration-300 mb-6">
-        <a href="{{ route('notes.show', $note) }}" class="grid grid-cols-1 md:grid-cols-5">
-          {{-- 文字 --}}
-          <div class="p-6 sm:p-8 md:col-span-3 flex flex-col justify-center">
+      <article class="group rounded-2xl border border-border bg-surface overflow-hidden hover:border-border-strong hover:shadow-md transition-all duration-300 mb-6">
+        <a href="{{ route('notes.show', $note) }}" class="block md:flex">
+          {{-- 左侧：文字信息 --}}
+          <div class="p-6 sm:p-8 md:w-3/5 flex flex-col justify-center min-h-[200px]">
+            {{-- 日期 --}}
             <div class="flex items-center gap-2 text-xs text-text-muted mb-3">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6l4 2m6-2A10 10 0 1 1 4.5 18.5"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M12 6v6l4 2m6-2A10 10 0 1 1 4.5 18.5"/>
               </svg>
               <span>发布于 {{ $note->created_at->format('Y-m-d') }}</span>
             </div>
 
+            {{-- 标题 --}}
             <h3 class="text-xl sm:text-2xl font-bold text-text group-hover:text-primary transition leading-snug mb-3">
               {{ $note->title }}
             </h3>
 
-            <p class="text-sm text-text-secondary line-clamp-2 leading-relaxed mb-4">
-              {{ $note->content }}
-            </p>
-
-            <div class="flex flex-wrap items-center gap-2 text-xs text-text-secondary">
+            {{-- 分类 & 标签 --}}
+            <div class="flex flex-wrap items-center gap-1.5 text-xs text-text-secondary mb-3">
               @if ($note->category)
                 <a href="{{ route('categories.show', $note->category) }}"
                    class="inline-flex items-center gap-1 hover:text-primary transition"
                    onclick="event.stopPropagation()">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2m14 0V9a2 2 0 0 0-2-2M5 11V9a2 2 0 0 1 2-2m0 0V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2M7 7h10"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                          d="M19 11H5m14 0a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2m14 0V9a2 2 0 0 0-2-2M5 11V9a2 2 0 0 1 2-2m0 0V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2M7 7h10"/>
                   </svg>
                   {{ $note->category->name }}
                 </a>
               @endif
+
               @if ($note->tags->isNotEmpty())
                 @if ($note->category)
                   <span class="text-border-strong">·</span>
                 @endif
                 @foreach ($note->tags->take(3) as $tag)
                   <a href="{{ route('tags.show', $tag) }}"
-                     class="hover:text-primary transition"
-                     onclick="event.stopPropagation()">{{ $tag->name }}</a>
+                     class="inline-flex items-center gap-1 hover:text-primary transition"
+                     onclick="event.stopPropagation()">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 0 1 0 2.828l-7 7a2 2 0 0 1-2.828 0l-7-7A2 2 0 0 1 3 12V7a4 4 0 0 1 4-4z"/>
+                    </svg>
+                    {{ $tag->name }}
+                  </a>
+                  @if !$loop->last
+                    <span class="text-border-strong">·</span>
+                  @endif
                 @endforeach
               @endif
             </div>
+
+            {{-- 摘要 --}}
+            <p class="text-sm text-text-secondary line-clamp-2 leading-relaxed">
+              {{ Str::stripTags(Str::markdown(e($note->content ?? ''))) }}
+            </p>
           </div>
 
-          {{-- 封面图 / 占位 --}}
-          <div class="md:col-span-2 min-h-[180px] md:min-h-full relative overflow-hidden">
+          {{-- 右侧：封面图 --}}
+          <div class="md:w-2/5 min-h-[180px] md:min-h-[220px] relative overflow-hidden bg-surface-2">
             @if ($note->cover_image_url)
               <img src="{{ $note->cover_image_url }}" alt="{{ $note->title }}"
                    loading="lazy"
-                   class="absolute inset-0 w-full h-full object-cover">
+                   class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
             @else
-              <div class="bg-sage-light min-h-[180px] md:min-h-full flex items-center justify-center relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-br from-sage/10 to-transparent"></div>
-                <div class="relative z-10 text-center">
-                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-sage/20 flex items-center justify-center mx-auto mb-2">
-                    <span class="text-2xl sm:text-3xl font-bold text-sage">
+              {{-- 无封面时的占位 --}}
+              <div class="absolute inset-0 bg-gradient-to-br from-sage-light/60 to-sage/20 flex items-center justify-center">
+                <div class="text-center">
+                  <div class="w-20 h-20 rounded-2xl bg-white/60 backdrop-blur-sm flex items-center justify-center mx-auto mb-3 shadow-sm">
+                    <span class="text-3xl font-bold text-sage">
                       {{ mb_substr($note->title, 0, 1) }}
                     </span>
                   </div>
-                  <span class="text-xs text-sage font-medium">Read more</span>
+                  <span class="text-xs text-sage/70 font-medium">点击阅读</span>
                 </div>
               </div>
             @endif
