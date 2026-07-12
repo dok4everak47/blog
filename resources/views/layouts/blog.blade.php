@@ -8,7 +8,21 @@
     {{-- 每页可通过 @section('title') 覆盖，默认用站点名 --}}
     <title>@yield('title', config('app.name', 'My Blog'))</title>
 
+    {{-- 主题切换：内联执行避免闪烁 --}}
+    <script>
+        (function() {
+            var stored = localStorage.getItem('theme');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (stored === 'dark' || (!stored && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}">
 </head>
 
 <body class="bg-bg min-h-screen text-text flex flex-col">

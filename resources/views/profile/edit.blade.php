@@ -10,19 +10,19 @@
 
     <div class="py-12 bg-bg">
         <div class="max-w-2xl mx-auto px-4 sm:px-6 space-y-6">
-            <div class="p-6 sm:p-8 bg-white border border-border rounded-2xl">
+            <div class="p-6 sm:p-8 bg-surface-2 border border-border rounded-2xl">
                 <div class="max-w-xl">
                     @include('profile.partials.update-profile-information-form')
                 </div>
             </div>
 
-            <div class="p-6 sm:p-8 bg-white border border-border rounded-2xl">
+            <div class="p-6 sm:p-8 bg-surface-2 border border-border rounded-2xl">
                 <div class="max-w-xl">
                     @include('profile.partials.update-password-form')
                 </div>
             </div>
 
-            <div class="p-6 sm:p-8 bg-white border border-border rounded-2xl">
+            <div class="p-6 sm:p-8 bg-surface-2 border border-border rounded-2xl">
                 <div class="max-w-xl">
                     @include('profile.partials.delete-user-form')
                 </div>

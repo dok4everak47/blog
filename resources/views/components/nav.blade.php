@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="sticky top-0 z-50 bg-white/70 backdrop-blur-md border-b border-border">
+<nav x-data="{ open: false }" class="sticky top-0 z-50 bg-surface-2/70 backdrop-blur-md border-b border-border">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
       {{-- Left: Logo + public links --}}
@@ -31,14 +31,29 @@
       <form action="{{ route('search') }}" method="GET" class="relative hidden sm:block flex-1 max-w-xs">
         <input type="text" name="q" value="{{ request('q') }}"
                placeholder="搜索文章…"
-               class="w-full rounded-lg border border-border bg-surface px-3 py-1.5 pl-9 text-sm text-text outline-none transition focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/10">
+               class="w-full rounded-lg border border-border bg-surface px-3 py-1.5 pl-9 text-sm text-text outline-none transition focus:border-primary focus:bg-surface-2 focus:ring-2 focus:ring-primary/10">
         <svg class="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>
       </form>
 
-      {{-- Right: auth state --}}
+      {{-- Right: theme toggle + auth state --}}
       <div class="hidden sm:flex items-center gap-3">
+        {{-- 主题切换 --}}
+        <button id="theme-toggle" type="button"
+                class="p-2 rounded-lg text-text-secondary hover:text-primary hover:bg-surface transition"
+                title="切换主题"
+                aria-label="切换主题">
+          <!-- sun icon (shown in dark mode) -->
+          <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+          </svg>
+          <!-- moon icon (shown in light mode) -->
+          <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+        </button>
+
         @guest
           <a href="{{ route('login') }}" class="text-sm text-text-secondary hover:text-primary transition px-3 py-2">Login</a>
           <a href="{{ route('register') }}" class="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover transition">Register</a>
@@ -62,7 +77,7 @@
               </svg>
             </button>
             <div x-show="userMenu" x-transition
-              class="absolute right-0 mt-2 w-44 rounded-xl border border-border bg-white shadow-sm overflow-hidden">
+              class="absolute right-0 mt-2 w-44 rounded-xl border border-border bg-surface-2 shadow-sm overflow-hidden">
               <a href="{{ route('profile.edit') }}" class="block px-4 py-2.5 text-sm text-text hover:bg-surface hover:text-primary transition">Profile</a>
               <form method="POST" action="{{ route('logout') }}">
                 @csrf
@@ -86,11 +101,11 @@
   </div>
 
   {{-- Mobile menu --}}
-  <div :class="{'block': open, 'hidden': !open}" class="hidden sm:hidden border-t border-border bg-white">
+  <div :class="{'block': open, 'hidden': !open}" class="hidden sm:hidden border-t border-border bg-surface-2">
     <div class="px-4 py-3 space-y-1">
       <form action="{{ route('search') }}" method="GET" class="relative mb-2">
         <input type="text" name="q" value="{{ request('q') }}" placeholder="搜索文章…"
-               class="w-full rounded-lg border border-border bg-surface px-3 py-2 pl-9 text-sm text-text outline-none transition focus:border-primary focus:bg-white">
+               class="w-full rounded-lg border border-border bg-surface px-3 py-2 pl-9 text-sm text-text outline-none transition focus:border-primary focus:bg-surface-2">
         <svg class="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>

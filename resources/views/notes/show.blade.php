@@ -43,7 +43,7 @@
       <div class="mt-8 flex flex-wrap gap-2">
         @foreach ($note->tags as $tag)
           <a href="{{ route('tags.show', $tag) }}"
-             class="rounded-full bg-white border border-border px-3 py-1 text-xs text-text-secondary hover:border-primary hover:text-primary transition">
+             class="rounded-full bg-surface-2 border border-border px-3 py-1 text-xs text-text-secondary hover:border-primary hover:text-primary transition">
             {{ $tag->name }}
           </a>
         @endforeach

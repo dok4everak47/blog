@@ -3,11 +3,13 @@
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
     --font-sans: 'Instrument Sans', 'Noto Sans SC', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 
-    /* 合荒小站 莫兰迪暖调色板 */
+    /* 合荒小站 莫兰迪暖调色板 — 亮色 */
     --color-bg: #FDFCFA;
     --color-surface: #F9F8F6;
     --color-surface-2: #FFFFFF;
@@ -30,7 +32,7 @@
 body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #FDFCFA;
+    background-color: var(--color-bg);
 }
 
 ::selection {
@@ -45,11 +47,11 @@ body {
     background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-    background: #EDEAE5;
+    background: var(--color-border);
     border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: #D88C8C;
+    background: var(--color-primary);
 }
 
 /* ============================================================
@@ -63,7 +65,7 @@ body {
 
 /* 写作区卡片：包裹标题与正文，提供纯净写作表面 */
 .card-editor {
-    background: #ffffff;
+    background: var(--color-surface-2);
     border: 1px solid var(--color-border);
     border-radius: 1rem;
     padding: 1.5rem 1.75rem;
@@ -114,7 +116,7 @@ body {
     width: 100%;
     border-radius: 0.5rem;
     border: 1px solid var(--color-border);
-    background-color: #fff;
+    background-color: var(--color-surface-2);
     padding: 0.625rem 1rem;
     font-size: 0.875rem;
     color: var(--color-text);
@@ -140,7 +142,7 @@ body {
     padding: 0.4rem 0.9rem;
     border-radius: 9999px;
     border: 1px solid var(--color-border);
-    background: #fff;
+    background: var(--color-surface-2);
     font-size: 0.8125rem;
     color: var(--color-text-secondary);
     cursor: pointer;
@@ -191,7 +193,7 @@ body {
     gap: 0.5rem;
     border-radius: 0.5rem;
     border: 1px solid var(--color-border);
-    background: #fff;
+    background: var(--color-surface-2);
     color: var(--color-text);
     font-weight: 500;
     font-size: 0.875rem;
@@ -548,7 +550,7 @@ body {
     gap: 0.2rem;
     margin: 0 -1.75rem 0.75rem;
     padding: 0.5rem 1.75rem;
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--color-surface-2);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--color-border);
@@ -669,9 +671,9 @@ body {
     color: var(--color-text);
 }
 .md-viewtoggle button.active {
-    background: #fff;
+    background: var(--color-surface-2);
     color: var(--color-primary);
-    box-shadow: 0 1px 2px rgba(44, 42, 40, 0.08);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 
 /* 编辑区布局：编辑 / 分屏 / 预览 */

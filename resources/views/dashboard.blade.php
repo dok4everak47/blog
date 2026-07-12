@@ -11,7 +11,7 @@
     <div class="py-12 bg-bg">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             {{-- Welcome --}}
-            <div class="rounded-2xl border border-border bg-white p-6 sm:p-8">
+            <div class="rounded-2xl border border-border bg-surface-2 p-6 sm:p-8">
                 <h1 class="text-2xl font-bold text-text">
                     你好，{{ Auth::user()->name }} 👋
                 </h1>
@@ -22,7 +22,7 @@
 
             {{-- Stats --}}
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="rounded-2xl border border-border bg-white p-6">
+                <div class="rounded-2xl border border-border bg-surface-2 p-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm text-text-secondary">文章总数</p>
@@ -31,7 +31,7 @@
                         <span class="text-3xl">📝</span>
                     </div>
                 </div>
-                <div class="rounded-2xl border border-border bg-white p-6">
+                <div class="rounded-2xl border border-border bg-surface-2 p-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm text-text-secondary">分类数</p>
@@ -40,7 +40,7 @@
                         <span class="text-3xl">📁</span>
                     </div>
                 </div>
-                <div class="rounded-2xl border border-border bg-white p-6">
+                <div class="rounded-2xl border border-border bg-surface-2 p-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm text-text-secondary">标签数</p>
@@ -52,7 +52,7 @@
             </div>
 
             {{-- Quick Actions --}}
-            <div class="rounded-2xl border border-border bg-white p-6 sm:p-8">
+            <div class="rounded-2xl border border-border bg-surface-2 p-6 sm:p-8">
                 <p class="text-xs font-medium tracking-[0.2em] text-primary uppercase mb-4">快捷操作</p>
                 <div class="flex flex-wrap gap-3">
                     <a href="{{ route('notes.create') }}"
@@ -71,7 +71,7 @@
             </div>
 
             {{-- 站点设置：Hero 背景图 --}}
-            <div class="rounded-2xl border border-border bg-white p-5 sm:p-6" x-data="heroImageManager({{ Illuminate\Support\Js::from($heroImage) }})">
+            <div class="rounded-2xl border border-border bg-surface-2 p-5 sm:p-6" x-data="heroImageManager({{ Illuminate\Support\Js::from($heroImage) }})">
                 <div class="flex items-center gap-4">
                     {{-- 缩略预览 --}}
                     <div class="relative w-28 h-16 rounded-lg overflow-hidden border border-border shrink-0 bg-surface-2">
@@ -121,7 +121,7 @@
             </div>
 
             {{-- Recent Notes --}}
-            <div class="rounded-2xl border border-border bg-white p-6 sm:p-8" x-data="coverManager()" x-cloak>
+            <div class="rounded-2xl border border-border bg-surface-2 p-6 sm:p-8" x-data="coverManager()" x-cloak>
                 <p class="text-xs font-medium tracking-[0.2em] text-primary uppercase mb-4">最近文章</p>
 
                 @if ($notes->isNotEmpty())
@@ -184,7 +184,7 @@
                      class="fixed inset-0 z-50 flex items-center justify-center p-4"
                      x-transition.opacity>
                     <div class="absolute inset-0 bg-black/50" @click="closeModal()"></div>
-                    <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6" @click.stop>
+                    <div class="relative bg-surface-2 rounded-2xl shadow-xl w-full max-w-md p-6" @click.stop>
                         <h3 class="font-bold text-lg text-text mb-1">更换封面</h3>
                         <p class="text-sm text-text-secondary mb-4 truncate" x-text="currentTitle"></p>
 
@@ -204,7 +204,7 @@
                         <input type="file" accept="image/*" class="hidden" x-ref="coverFile"
                                @change="onFileChange($event)">
                         <button type="button"
-                                class="w-full py-2.5 rounded-lg border border-border bg-surface text-sm font-medium text-text hover:bg-white transition"
+                                class="w-full py-2.5 rounded-lg border border-border bg-surface text-sm font-medium text-text hover:bg-surface-2 transition"
                                 @click="$refs.coverFile.click()">
                             选择图片
                         </button>
