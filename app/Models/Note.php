@@ -13,7 +13,7 @@ class Note extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'content', 'category_id', 'status', 'slug', 'cover_image'];
+    protected $fillable = ['title', 'content', 'category_id', 'status', 'slug', 'cover_image', 'excerpt'];
 
     protected function casts(): array
     {
@@ -67,6 +67,20 @@ class Note extends Model
     {
         $chars = mb_strlen(strip_tags($this->content ?? ''));
         return max(1, (int) round($chars / 400));
+    }
+
+    /**
+     * 从 content 自动生成摘要（去除 Markdown 语法后截取）
+     */
+    public static function generateExcerpt(?string $content, int $limit = 200): string
+    {
+        if (empty($content)) return '';
+
+        $text = preg_replace('/!\[.*?\]\([^)]+\)|\[.*?\]\([^)]+\)|`[^`]+`/', '', $content);
+        $text = strip_tags($text);
+        $text = preg_replace('/\s+/', ' ', trim($text));
+
+        return \Illuminate\Support\Str::limit($text, $limit);
     }
 
     public function tags()

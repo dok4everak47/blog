@@ -176,17 +176,7 @@
                 </h3>
 
                 <p class="text-sm text-text-secondary line-clamp-2 leading-relaxed mb-4">
-                  @php
-                    $excerpt = $note->content;
-                    // 去掉 Markdown 图片 ![alt](url)
-                    $excerpt = preg_replace('/!\[.*?\]\([^)]+\)/', '', $excerpt);
-                    // 去掉其他常见 Markdown 噪音（链接、代码块等）
-                    $excerpt = preg_replace('/\[.*?\]\([^)]+\)/', '', $excerpt);
-                    $excerpt = preg_replace('/`[^`]+`/', '', $excerpt);
-                    // 清理多余空白
-                    $excerpt = preg_replace('/\s+/', ' ', trim($excerpt));
-                    echo \Illuminate\Support\Str::limit($excerpt, 120);
-                  @endphp
+                  {{ $note->excerpt ?: \App\Models\Note::generateExcerpt($note->content, 120) }}
                 </p>
 
                 <div class="flex flex-wrap items-center gap-2 text-xs text-text-secondary">

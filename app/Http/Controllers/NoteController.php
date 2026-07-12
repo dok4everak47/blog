@@ -56,6 +56,7 @@ class NoteController extends Controller
         $note = auth()->user()->notes()->create([
             'title' => $request->title,
             'content' => $request->content,
+            'excerpt' => $request->filled('excerpt') ? $request->excerpt : Note::generateExcerpt($request->content),
             'category_id' => $request->category_id,
             'slug' => $this->makeSlug($request->slug, $request->title, null),
             'status' => $request->input('status', 'published'),
@@ -80,7 +81,7 @@ class NoteController extends Controller
         // Policy 双重校验：已发布→放行，草稿→仅作者（含 403/404）
         $this->authorize('view', $note);
 
-        $note->load('tags', 'category');
+        $note->load('tags', 'category', 'comments.replies');
 
         // 上一篇 / 下一篇（仅已发布）
         $previous = Note::published()->where('id', '<', $note->id)->latest('id')->first();
@@ -120,6 +121,7 @@ class NoteController extends Controller
         $data = [
             'title' => $request->title,
             'content' => $request->content,
+            'excerpt' => $request->filled('excerpt') ? $request->excerpt : Note::generateExcerpt($request->content),
             'category_id' => $request->category_id,
             'slug' => $this->makeSlug($request->slug, $request->title, $note->id),
             'status' => $request->input('status', $note->status?->value ?? 'published'),

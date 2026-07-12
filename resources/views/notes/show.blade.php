@@ -2,12 +2,8 @@
 @section('title', ($note->title ?? '') . ' · My Blog')
 
 @php
-$seoDescription = \Illuminate\Support\Str::limit(
-    strip_tags(
-        preg_replace('/!\[.*?\]\([^)]+\)|\[.*?\]\([^)]+\)|`[^`]+`/', '', $note->content ?? '')
-    ),
-    160
-);
+$seoDescription = $note->excerpt
+    ?? \App\Models\Note::generateExcerpt($note->content, 160);
 $ogImage = $note->cover_image_url
     ?? (preg_match('/!\[.*?\]\(([^)]+)\)/', $note->content ?? '', $m) ? $m[1] : null);
 @endphp
