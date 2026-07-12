@@ -60,7 +60,7 @@
                     </svg>
                     {{ $tag->name }}
                   </a>
-                  @if !$loop->last
+                  @if(!$loop->last)
                     <span class="text-border-strong">·</span>
                   @endif
                 @endforeach
@@ -69,7 +69,7 @@
 
             {{-- 摘要 --}}
             <p class="text-sm text-text-secondary line-clamp-2 leading-relaxed">
-              {{ Str::stripTags(Str::markdown(e($note->content ?? ''))) }}
+              {{ strip_tags(Str::markdown($note->content ?? '')) }}
             </p>
           </div>
 
