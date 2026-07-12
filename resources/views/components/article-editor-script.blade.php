@@ -24,6 +24,12 @@
             coverRemoved: false,
             _autosaving: false,
 
+            // 插入图片弹窗
+            imageModalOpen: false,
+            imageUrl: '',
+            imageAlt: '',
+            imageUploading: false,
+
             // 编辑器：视图模式 + 预览 + 工具栏高亮
             viewMode: 'edit',          // edit | split | preview
             previewHtml: '',
@@ -326,15 +332,71 @@
                 this.setValue(newVal, start + md.length, start + md.length);
             },
 
+            // 点击工具栏「插入图片」→ 打开弹窗（支持本地上传 / 链接）
             insertImage() {
+                this.openImageModal();
+            },
+
+            openImageModal() {
+                this.imageModalOpen = true;
+                this.imageUrl = '';
+                this.imageAlt = '';
+                this.imageUploading = false;
+                this.$nextTick(() => {
+                    if (this.$refs.imageFileInput) this.$refs.imageFileInput.value = '';
+                });
+            },
+
+            closeImageModal() {
+                this.imageModalOpen = false;
+            },
+
+            // 上传本地图片到 /notes/upload-image，成功后回填 URL 并自动填入 alt
+            async uploadInlineImage() {
+                const file = this.$refs.imageFileInput.files && this.$refs.imageFileInput.files[0];
+                if (!file) return;
+                this.imageUploading = true;
+                this.errors = [];
+                const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
+                const fd = new FormData();
+                fd.append('image', file);
+                try {
+                    const res = await fetch(this.$root.dataset.uploadImageUrl, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': token,
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: fd,
+                    });
+                    if (!res.ok) {
+                        const data = await res.json().catch(() => ({}));
+                        this.errors = data.errors ? Object.values(data.errors).flat() : ['图片上传失败，请重试'];
+                        this.imageUploading = false;
+                        return;
+                    }
+                    const data = await res.json();
+                    this.imageUrl = data.url;
+                    this.imageAlt = file.name.replace(/\.[^.]+$/, '');
+                } catch (e) {
+                    this.errors = ['图片上传失败，请重试'];
+                } finally {
+                    this.imageUploading = false;
+                }
+            },
+
+            // 确认插入：将 ![alt](url) 写入正文
+            confirmImageInsert() {
+                const url = (this.imageUrl || '').trim();
+                if (!url) return;
+                const alt = (this.imageAlt || '').trim() || '图片';
+                const md = '![' + alt + '](' + url + ')';
                 const ta = this.ta, val = ta.value;
                 const start = ta.selectionStart, end = ta.selectionEnd;
-                const selected = val.slice(start, end) || '图片描述';
-                const url = window.prompt('请输入图片地址：', 'https://');
-                if (url === null) return;
-                const md = '![' + selected + '](' + url + ')';
                 const newVal = val.slice(0, start) + md + val.slice(end);
                 this.setValue(newVal, start + md.length, start + md.length);
+                this.closeImageModal();
             },
 
             insertTable() {

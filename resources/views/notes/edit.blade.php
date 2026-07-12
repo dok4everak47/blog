@@ -18,7 +18,8 @@
        data-note-id="{{ $note->id }}"
        data-initial-cover="{{ $note->cover_image_url ?? '' }}"
        data-autosave-url="{{ route('notes.autosave') }}"
-       data-update-url="{{ route('notes.update', '__ID__') }}">
+       data-update-url="{{ route('notes.update', '__ID__') }}"
+       data-upload-image-url="{{ route('notes.upload-image') }}">
 
     <main class="max-w-4xl mx-auto px-4 sm:px-6 pt-6 pb-28">
       {{-- 顶部：面包屑 + 保存状态 --}}
@@ -153,6 +154,9 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          class="toast" x-text="toastMsg"></div>
+
+    {{-- 插入图片弹窗（上传本地图片 / 粘贴链接） --}}
+    @include('components.image-insert-modal')
   </div>
 
   @include('components.article-editor-script')

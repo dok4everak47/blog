@@ -7,10 +7,12 @@ use App\Models\Tag;
 use App\Models\Category;
 use App\Http\Requests\StoreNoteRequest;
 use App\Http\Requests\UpdateNoteRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 class NoteController extends Controller
@@ -206,6 +208,28 @@ class NoteController extends Controller
             'id' => $note->id,
             'saved_at' => $note->updated_at->timestamp,
             'cover_url' => $note->cover_image_url,
+        ]);
+    }
+
+    /**
+     * 编辑器内联图片上传（本地文件 → /storage/uploads）
+     * 仅供已登录用户使用，配合工具栏「插入图片」弹窗。
+     * 显式返回 JSON（含验证失败 422），不依赖全局 shouldRenderJsonWhen('api/*') 配置。
+     */
+    public function uploadImage(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $path = $request->file('image')->store('uploads', 'public');
+
+        return response()->json([
+            'url' => '/storage/'.ltrim($path, '/'),
         ]);
     }
 

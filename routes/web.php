@@ -61,6 +61,11 @@ Route::middleware('auth')->group(function () {
         ->middleware('throttle:30,1')
         ->name('notes.autosave');
 
+    // 编辑器内联图片上传（本地文件 → /storage/uploads，限流防滥用）
+    Route::post('/notes/upload-image', [NoteController::class, 'uploadImage'])
+        ->middleware('throttle:30,1')
+        ->name('notes.upload-image');
+
     // 编辑器内联快速创建分类
     Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
 
