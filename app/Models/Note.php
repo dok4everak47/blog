@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\NoteStatus;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Tag;
 use App\Models\User;
@@ -10,21 +11,28 @@ use Illuminate\Support\Facades\Storage;
 
 class Note extends Model
 {
-    //
     use HasFactory;
+
     protected $fillable = ['title', 'content', 'category_id', 'status', 'slug', 'cover_image'];
 
+    protected function casts(): array
+    {
+        return [
+            'status' => NoteStatus::class,
+        ];
+    }
+
     /**
-     * 草稿 / 已发布 状态判断
+     * 状态快捷判断
      */
     public function isDraft(): bool
     {
-        return $this->status === 'draft';
+        return $this->status === NoteStatus::Draft;
     }
 
     public function isPublished(): bool
     {
-        return $this->status === 'published';
+        return $this->status === NoteStatus::Published;
     }
 
     /**
@@ -32,15 +40,15 @@ class Note extends Model
      */
     public function scopePublished($query)
     {
-        return $query->where('status', 'published');
+        return $query->where('status', NoteStatus::Published->value);
     }
 
     /**
-     * 仅查询草稿
+     * 仅查询草稿（后台管理用）
      */
     public function scopeDraft($query)
     {
-        return $query->where('status', 'draft');
+        return $query->where('status', NoteStatus::Draft->value);
     }
 
     /**
@@ -83,4 +91,3 @@ class Note extends Model
             : null;
     }
 }
-

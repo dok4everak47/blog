@@ -20,7 +20,7 @@ class UpdateNoteRequest extends FormRequest
             'category_id' => 'nullable|exists:categories,id',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
-            'status' => 'nullable|in:draft,published',
+            'status' => 'nullable|in:draft,published,archived',
             'slug' => 'nullable|string|max:255',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
             'remove_cover' => 'nullable|boolean',

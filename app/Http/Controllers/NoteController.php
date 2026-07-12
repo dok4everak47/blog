@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Note;
 use App\Models\Tag;
 use App\Models\Category;
+use App\Enums\NoteStatus;
 use App\Http\Requests\StoreNoteRequest;
 use App\Http\Requests\UpdateNoteRequest;
 use Illuminate\Http\JsonResponse;
@@ -123,7 +124,7 @@ class NoteController extends Controller
             'content' => $request->content,
             'category_id' => $request->category_id,
             'slug' => $this->makeSlug($request->slug, $request->title, $note->id),
-            'status' => $request->input('status', $note->status),
+            'status' => $request->input('status', $note->status?->value ?? 'published'),
         ];
 
         // 封面图：上传新图 / 移除旧图
@@ -199,7 +200,7 @@ class NoteController extends Controller
             if ($request->hasFile('cover_image')) {
                 $attrs['cover_image'] = $request->file('cover_image')->store('covers', 'public');
             }
-            $attrs['status'] = 'draft';
+            $attrs['status'] = NoteStatus::Draft->value;
             $note = auth()->user()->notes()->create($attrs);
             $note->tags()->sync($data['tags'] ?? []);
         }
