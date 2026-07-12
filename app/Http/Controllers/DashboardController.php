@@ -10,12 +10,16 @@ use Illuminate\View\View;
 class DashboardController extends Controller
 {
     /**
-     * 后台首页：统计 + 最近文章（含草稿）
+     * 后台首页：统计 + 最近文章（仅当前用户，含草稿）
      */
     public function index(): View
     {
-        $notes = Note::latest()->take(5)->get();
-        $notesCount = Note::count();
+        $notes = Note::where('user_id', auth()->id())
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $notesCount = Note::where('user_id', auth()->id())->count();
         $categoriesCount = Category::count();
         $tagsCount = Tag::count();
 

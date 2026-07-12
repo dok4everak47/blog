@@ -56,6 +56,11 @@ Route::middleware('auth')->group(function () {
     Route::put('/notes/{note}', [NoteController::class, 'update'])->name('notes.update');
     Route::delete('/notes/{note}', [NoteController::class, 'destroy'])->name('notes.destroy');
 
+    // 后台快速更换封面图（Dashboard 列表弹窗，仅更新封面字段）
+    Route::post('/notes/{note}/cover', [NoteController::class, 'updateCover'])
+        ->middleware('throttle:30,1')
+        ->name('notes.updateCover');
+
     // 自动保存（限流防滥用）
     Route::post('/notes/autosave', [NoteController::class, 'autosave'])
         ->middleware('throttle:30,1')

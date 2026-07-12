@@ -234,6 +234,51 @@ class NoteController extends Controller
     }
 
     /**
+     * 后台快速更换封面图（Dashboard 列表弹窗调用，返回 JSON）
+     * 仅更新 cover_image 字段，不触碰正文/标题等其它内容。
+     */
+    public function updateCover(Request $request, Note $note): JsonResponse
+    {
+        $this->authorize('update', $note);
+
+        $validator = Validator::make($request->all(), [
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+            'remove_cover' => 'nullable|boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // 无操作：既没有上传新图也没有移除
+        if (!$request->hasFile('cover_image') && !$request->boolean('remove_cover')) {
+            return response()->json([
+                'cover_url' => $note->cover_image_url,
+                'message' => '未变更',
+            ]);
+        }
+
+        if ($request->hasFile('cover_image')) {
+            if ($note->cover_image) {
+                Storage::disk('public')->delete($note->cover_image);
+            }
+            $cover = $request->file('cover_image')->store('covers', 'public');
+        } else { // remove_cover = true
+            if ($note->cover_image) {
+                Storage::disk('public')->delete($note->cover_image);
+            }
+            $cover = null;
+        }
+
+        $note->update(['cover_image' => $cover]);
+
+        return response()->json([
+            'cover_url' => $note->cover_image_url,
+            'message' => '封面已更新',
+        ]);
+    }
+
+    /**
      * 生成唯一 Slug：优先使用用户填写的 slug，其次从标题生成。
      */
     private function makeSlug(?string $slug, string $title, ?int $ignoreId): ?string
