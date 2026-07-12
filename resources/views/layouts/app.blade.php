@@ -20,7 +20,7 @@
             })();
         </script>
 
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/cropper.js'])
     </head>
     <body class="font-sans antialiased text-text bg-bg min-h-screen flex flex-col">
         <x-nav />

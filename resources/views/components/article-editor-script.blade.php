@@ -26,6 +26,7 @@
             coverPreview: null,
             coverChanged: false,
             coverRemoved: false,
+            _croppedCoverBlob: null,
             _autosaving: false,
 
             // 插入图片弹窗
@@ -188,16 +189,22 @@
             onCoverChange() {
                 const file = this.$refs.coverInput.files && this.$refs.coverInput.files[0];
                 if (!file) return;
-                if (this.coverPreview && this.coverPreview.startsWith('blob:')) {
-                    URL.revokeObjectURL(this.coverPreview);
-                }
-                this.coverPreview = URL.createObjectURL(file);
-                this.coverChanged = true;
-                this.coverRemoved = false;
-                this.dirty = true;
-                this.savedLabel = '未保存';
-                clearTimeout(this._autosaveTimer);
-                this._autosaveTimer = setTimeout(() => this.autosaveSave(false), 1500);
+
+                window.openImageCropper(file).then(croppedBlob => {
+                    if (this.coverPreview && this.coverPreview.startsWith('blob:')) {
+                        URL.revokeObjectURL(this.coverPreview);
+                    }
+                    this.coverPreview = URL.createObjectURL(croppedBlob);
+                    this._croppedCoverBlob = croppedBlob;
+                    this.coverChanged = true;
+                    this.coverRemoved = false;
+                    this.dirty = true;
+                    this.savedLabel = '未保存';
+                    clearTimeout(this._autosaveTimer);
+                    this._autosaveTimer = setTimeout(() => this.autosaveSave(false), 1500);
+                }).catch(() => {
+                    this.$refs.coverInput.value = '';
+                });
             },
 
             removeCover() {
@@ -206,12 +213,52 @@
                     URL.revokeObjectURL(this.coverPreview);
                 }
                 this.coverPreview = null;
+                this._croppedCoverBlob = null;
                 this.coverRemoved = true;
                 this.coverChanged = false;
                 this.dirty = true;
                 this.savedLabel = '未保存';
                 clearTimeout(this._autosaveTimer);
                 this._autosaveTimer = setTimeout(() => this.autosaveSave(false), 1500);
+            },
+
+            // 对已有封面图片重新裁剪
+            async cropCover() {
+                if (!this.coverPreview) return;
+                try {
+                    // 如果是 blob URL，直接从已有的 blob 重建 File
+                    if (this._croppedCoverBlob) {
+                        const file = new File([this._croppedCoverBlob], 'cover.jpg', { type: this._croppedCoverBlob.type });
+                        const croppedBlob = await window.openImageCropper(file);
+                        if (this.coverPreview.startsWith('blob:')) URL.revokeObjectURL(this.coverPreview);
+                        this.coverPreview = URL.createObjectURL(croppedBlob);
+                        this._croppedCoverBlob = croppedBlob;
+                        this.coverChanged = true;
+                        this.coverRemoved = false;
+                        this.dirty = true;
+                        this.savedLabel = '未保存';
+                        clearTimeout(this._autosaveTimer);
+                        this._autosaveTimer = setTimeout(() => this.autosaveSave(false), 1500);
+                        return;
+                    }
+                    // 远程 URL → fetch 转为 File
+                    const res = await fetch(this.coverPreview);
+                    if (!res.ok) throw new Error('加载封面失败');
+                    const blob = await res.blob();
+                    const file = new File([blob], 'cover.' + (blob.type === 'image/png' ? 'png' : 'jpg'), { type: blob.type });
+                    const croppedBlob = await window.openImageCropper(file);
+                    if (this.coverPreview.startsWith('blob:')) URL.revokeObjectURL(this.coverPreview);
+                    this.coverPreview = URL.createObjectURL(croppedBlob);
+                    this._croppedCoverBlob = croppedBlob;
+                    this.coverChanged = true;
+                    this.coverRemoved = false;
+                    this.dirty = true;
+                    this.savedLabel = '未保存';
+                    clearTimeout(this._autosaveTimer);
+                    this._autosaveTimer = setTimeout(() => this.autosaveSave(false), 1500);
+                } catch (err) {
+                    // 用户取消或加载失败，忽略
+                }
             },
 
             // ---------- Markdown 工具栏核心 ----------
@@ -598,7 +645,9 @@
                 fd.append('slug', this.slug || '');
                 this.selectedTags.forEach((t) => fd.append('tags[]', t));
                 fd.append('status', 'draft');
-                if (this.coverChanged && this.$refs.coverInput.files[0]) {
+                if (this.coverChanged && this._croppedCoverBlob) {
+                    fd.append('cover_image', this._croppedCoverBlob, this._croppedCoverBlob.name || 'cover.jpg');
+                } else if (this.coverChanged && this.$refs.coverInput.files[0]) {
                     fd.append('cover_image', this.$refs.coverInput.files[0]);
                 }
                 if (this.coverRemoved) {
@@ -725,6 +774,7 @@
                     if (data.cover_url) {
                         this.coverPreview = data.cover_url;
                         this.coverChanged = false;
+                        this._croppedCoverBlob = null;
                         this.$refs.coverInput.value = '';
                     }
                     this.dirty = false;

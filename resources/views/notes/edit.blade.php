@@ -109,6 +109,7 @@
             <img :src="coverPreview" alt="封面预览" class="cover-preview-img">
             <div class="flex items-center gap-4 mt-3">
               <button type="button" class="cover-link-btn" @click="$refs.coverInput.click()">更换封面</button>
+              <button type="button" class="cover-link-btn" @click="cropCover()">裁剪封面</button>
               <button type="button" class="cover-link-btn text-red-600" @click="removeCover()">移除封面</button>
             </div>
           </div>

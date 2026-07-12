@@ -1,5 +1,9 @@
 import Alpine from 'alpinejs';
 import Prism from 'prismjs';
+import { openImageCropper } from './cropper.js';
+
+// 暴露到全局，供 article-editor-script 等内联脚本调用
+window.openImageCropper = openImageCropper;
 
 // 常用语法高亮语言
 import 'prismjs/components/prism-markup';

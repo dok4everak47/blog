@@ -361,13 +361,17 @@
                 onFileChange(e) {
                     const f = e.target.files && e.target.files[0];
                     if (!f) return;
-                    if (this.preview && this.preview.startsWith('blob:')) {
-                        URL.revokeObjectURL(this.preview);
-                    }
-                    this.preview = URL.createObjectURL(f);
-                    this.file = f;
-                    this.removeFlag = false;
-                    this.errors = [];
+                    window.openImageCropper(f).then(croppedBlob => {
+                        if (this.preview && this.preview.startsWith('blob:')) {
+                            URL.revokeObjectURL(this.preview);
+                        }
+                        this.preview = URL.createObjectURL(croppedBlob);
+                        this.file = croppedBlob;
+                        this.removeFlag = false;
+                        this.errors = [];
+                    }).catch(() => {
+                        e.target.value = '';
+                    });
                 },
 
                 removeCover() {
@@ -441,16 +445,18 @@
                 onFileChange(e) {
                     const f = e.target.files && e.target.files[0];
                     if (!f) return;
-                    // 预览
-                    if (this.currentUrl && this.currentUrl.startsWith('blob:')) {
-                        URL.revokeObjectURL(this.currentUrl);
-                    }
-                    this.currentUrl = URL.createObjectURL(f);
-                    this.file = f;
-                    this.error = null;
-                    this.success = null;
-                    // 自动上传
-                    this.save();
+                    window.openImageCropper(f).then(croppedBlob => {
+                        if (this.currentUrl && this.currentUrl.startsWith('blob:')) {
+                            URL.revokeObjectURL(this.currentUrl);
+                        }
+                        this.currentUrl = URL.createObjectURL(croppedBlob);
+                        this.file = croppedBlob;
+                        this.error = null;
+                        this.success = null;
+                        this.save();
+                    }).catch(() => {
+                        e.target.value = '';
+                    });
                 },
 
                 async remove() {
