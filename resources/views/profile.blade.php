@@ -10,7 +10,12 @@
 
 @section('content')
 @php
-    $aboutHtml = \App\Models\SiteSetting::get('about_html', '');
+    $about = \App\Models\SiteSetting::get('about_content', [
+        'opening' => '',
+        'intro_items' => [],
+        'tech_interests' => [],
+        'contacts' => [],
+    ]);
 @endphp
 
 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
@@ -27,12 +32,65 @@
         </h1>
       </header>
 
-      {{-- 富文本内容区域 --}}
-      @if($aboutHtml)
-      <article class="about-content text-[15px] leading-[1.85] text-text-secondary prose-custom">
-        {!! \Illuminate\Support\Str::purify($aboutHtml) !!}
-      </article>
-      @else
+      {{-- 开场白 --}}
+      @if($about['opening'])
+      <div class="mb-8">
+        <p class="text-[15px] leading-[1.85] text-text-secondary">{{ $about['opening'] }}</p>
+      </div>
+      @endif
+
+      {{-- 自我介绍条目 --}}
+      @if(!empty($about['intro_items']))
+      <section class="mb-8" id="about-intro">
+        <h2 class="text-lg font-bold text-text mb-4 flex items-center gap-2">
+          <span class="text-primary">◆</span> 自我介绍
+        </h2>
+        <dl class="space-y-3">
+          @foreach($about['intro_items'] as $item)
+          <div class="flex items-baseline gap-3 py-2 border-b border-dashed border-border last:border-0">
+            <dt class="flex items-center gap-1.5 text-sm font-medium text-text min-w-[100px]">
+              <span>{{ $item['emoji'] }}</span> {{ $item['label'] }}
+            </dt>
+            <dd class="text-sm text-text-secondary">{{ $item['value'] }}</dd>
+          </div>
+          @endforeach
+        </dl>
+      </section>
+      @endif
+
+      {{-- 技术兴趣 --}}
+      @if(!empty($about['tech_interests']))
+      <section class="mb-8" id="about-tech">
+        <h2 class="text-lg font-bold text-text mb-4 flex items-center gap-2">
+          <span class="text-primary">◆</span> 技术兴趣
+        </h2>
+        <div class="flex flex-wrap gap-2">
+          @foreach($about['tech_interests'] as $tag)
+          <span class="rounded-lg bg-surface-2 border border-border px-3 py-1.5 text-xs font-medium text-text-secondary">{{ $tag }}</span>
+          @endforeach
+        </div>
+      </section>
+      @endif
+
+      {{-- 联系方式 --}}
+      @if(!empty($about['contacts']))
+      <section class="mb-8" id="about-contact">
+        <h2 class="text-lg font-bold text-text mb-4 flex items-center gap-2">
+          <span class="text-primary">◆</span> 联系方式
+        </h2>
+        <dl class="space-y-3">
+          @foreach($about['contacts'] as $item)
+          <div class="flex items-baseline gap-3 py-2 border-b border-dashed border-border last:border-0">
+            <dt class="text-sm font-medium text-text min-w-[80px]">{{ $item['type'] }}</dt>
+            <dd class="text-sm text-text-secondary">{{ $item['value'] }}</dd>
+          </div>
+          @endforeach
+        </dl>
+      </section>
+      @endif
+
+      {{-- 全部为空时 --}}
+      @if(empty($about['opening']) && empty($about['intro_items']) && empty($about['tech_interests']) && empty($about['contacts']))
       <p class="text-text-muted italic py-8">暂无内容…</p>
       @endif
 
@@ -101,11 +159,11 @@
 (function() {
     var tocContainer = document.getElementById('about-toc');
     if (!tocContainer) return;
-    var article = document.querySelector('.about-content');
+    var article = document.querySelector('.flex-1.min-w-0');
     if (!article) return;
 
-    var headings = article.querySelectorAll('h2, h3');
-    var icons = { h2: '📌', h3: '└' };
+    var headings = article.querySelectorAll('h2');
+    var icons = { h2: '◆' };
 
     headings.forEach(function(h, i) {
         if (!h.id) {

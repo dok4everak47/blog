@@ -28,34 +28,60 @@ class DashboardController extends Controller
         $categoriesCount = Category::count();
         $tagsCount = Tag::count();
         $heroImage = SiteSetting::get('hero_image');
-        $aboutHtml = SiteSetting::get('about_html', '');
+        $aboutContent = SiteSetting::get('about_content', [
+            'opening' => '',
+            'intro_items' => [],
+            'tech_interests' => [],
+            'contacts' => [],
+        ]);
 
-        return view('dashboard', compact('notes', 'notesCount', 'categoriesCount', 'tagsCount', 'heroImage', 'aboutHtml'));
+        return view('dashboard', compact('notes', 'notesCount', 'categoriesCount', 'tagsCount', 'heroImage', 'aboutContent'));
     }
 
     /**
-     * 获取 About 页面富文本内容
+     * 获取 About 页面结构化内容
      */
     public function getAboutContent(): JsonResponse
     {
-        $html = SiteSetting::get('about_html', '');
-        return response()->json(['html' => $html]);
+        $data = SiteSetting::get('about_content', [
+            'opening' => '',
+            'intro_items' => [],
+            'tech_interests' => [],
+            'contacts' => [],
+        ]);
+        return response()->json($data);
     }
 
     /**
-     * 保存 About 页面富文本内容
+     * 保存 About 页面结构化内容
      */
     public function updateAboutContent(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'html' => 'nullable|string|max:20000',
+            'opening' => 'nullable|string|max:500',
+            'intro_items' => 'nullable|array',
+            'intro_items.*.emoji' => 'required_with:intro_items|string|max:10',
+            'intro_items.*.label' => 'required_with:intro_items|string|max:50',
+            'intro_items.*.value' => 'required_with:intro_items|string|max:200',
+            'tech_interests' => 'nullable|array',
+            'tech_interests.*' => 'string|max:50',
+            'contacts' => 'nullable|array',
+            'contacts.*.type' => 'required_with:contacts|string|max:30',
+            'contacts.*.value' => 'required_with:contacts|string|max:100',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()->toArray()], 422);
         }
 
-        SiteSetting::set('about_html', $request->input('html', ''));
+        $data = [
+            'opening' => $request->input('opening', ''),
+            'intro_items' => $request->input('intro_items', []),
+            'tech_interests' => $request->input('tech_interests', []),
+            'contacts' => $request->input('contacts', []),
+        ];
+
+        SiteSetting::set('about_content', $data, 'json');
 
         return response()->json(['message' => 'About 内容已更新']);
     }
