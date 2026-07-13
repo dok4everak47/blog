@@ -50,7 +50,7 @@
       <svg class="hero-quote-icon" fill="currentColor" viewBox="0 0 24 24">
         <path d="M7.17 6A5.001 5.001 0 0 0 2 11v7h7v-7H5.5a3.5 3.5 0 0 1 3.5-3.5V6h-1.83zm12 0A5.001 5.001 0 0 0 14 11v7h7v-7h-3.5a3.5 3.5 0 0 1 3.5-3.5V6h-1.83z"/>
       </svg>
-      <span class="hero-quote-text">万物合鸣 · 独守一荒 —— 记录生活与思考的每一刻</span>
+      <span class="hero-quote-text">釜底抽薪 · 斩草除根 —— 直抵本质，方见真章</span>
       <svg class="hero-quote-icon" fill="currentColor" viewBox="0 0 24 24" style="margin-top: auto; margin-bottom: 0.15rem;">
         <path d="M16.83 18A5.001 5.001 0 0 0 22 13V6h-7v7h3.5a3.5 3.5 0 0 1-3.5 3.5V18h1.83zm-12 0A5.001 5.001 0 0 0 10 13V6H3v7h3.5a3.5 3.5 0 0 1-3.5 3.5V18h1.83z"/>
       </svg>
