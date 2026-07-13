@@ -15,8 +15,6 @@ class Note extends Model
 
     protected $fillable = ['title', 'content', 'category_id', 'user_id', 'status', 'slug', 'cover_image', 'thumbnail_url', 'excerpt'];
 
-    protected $with = ['category', 'user'];
-
     protected function casts(): array
     {
         return [
