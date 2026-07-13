@@ -53,8 +53,8 @@ if [ "$OS_ID" = "ubuntu" ]; then
     sudo apt update
 elif [ "$OS_ID" = "debian" ]; then
     echo ">>> [Debian] 添加 SURY PHP 仓库..."
-    sudo curl -sSLo /usr/share/keyrings/debsuryorg-archive-keyring.gpg https://packages.sury.org/debsuryorg-archive-keyring.gpg
-    echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/debian/ ${OS_CODENAME} main" | sudo tee /etc/apt/sources.list.d/sury-php.list
+    sudo curl -sSLo /usr/share/keyrings/debsuryorg-archive-keyring.gpg https://sury.org/debsuryorg-archive-keyring.gpg
+    echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://sury.org/debsury.org/ ${OS_CODENAME} main" | sudo tee /etc/apt/sources.list.d/sury-php.list
     sudo apt update
 else
     echo "❌ 不支持的发行版: $OS_ID（仅支持 Ubuntu / Debian）"
