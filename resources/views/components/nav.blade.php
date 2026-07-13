@@ -4,8 +4,8 @@
       {{-- Left: Logo + public links --}}
       <div class="flex items-center gap-6">
         <a href="{{ route('home') }}" class="flex items-center gap-2">
-          <span class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white text-sm font-bold">M</span>
-          <span class="text-base font-bold text-text">My Blog</span>
+          <span class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white text-sm font-bold">A</span>
+          <span class="text-base font-bold text-text">Ad Fontes Codicis</span>
         </a>
         <div class="hidden sm:flex items-center gap-5">
           <a href="{{ route('home') }}"

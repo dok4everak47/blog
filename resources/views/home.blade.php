@@ -44,7 +44,7 @@
 
   {{-- 中心内容 --}}
   <div class="hero-content">
-    <h1 class="hero-title hero-animate-fade-in-down">My Blog</h1>
+    <h1 class="hero-title hero-animate-fade-in-down">釜底抽薪</h1>
 
     <div class="hero-quote hero-animate-slit-in">
       <svg class="hero-quote-icon" fill="currentColor" viewBox="0 0 24 24">
