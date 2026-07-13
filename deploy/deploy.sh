@@ -52,6 +52,17 @@ if [[ "$1" == "init" ]]; then
         exit 0
     fi
 
+    # 检查 composer 是否已安装
+    if ! command -v composer &> /dev/null; then
+        info "安装 Composer..."
+        curl -sS https://getcomposer.org/installer | php
+        sudo mv composer.phar /usr/local/bin/composer
+    fi
+
+    # 先安装依赖（vendor/ 不在 git 中，必须先装）
+    info "安装 PHP 依赖（首次）"
+    composer install --no-interaction
+
     # 生成 APP_KEY
     if grep -q "^APP_KEY=$" .env; then
         info "生成 APP_KEY"
