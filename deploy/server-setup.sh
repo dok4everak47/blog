@@ -20,12 +20,9 @@ APP_DB_PASS=$(openssl rand -base64 24)
 
 echo "=========================================="
 echo " Laravel Blog 服务器环境初始化"
-echo " 数据库: ${APP_DB_NAME}"
-echo " 用户:   ${APP_DB_USER}"
-echo " 密码:   ${APP_DB_PASS}"
 echo "=========================================="
 echo ""
-echo "⚠️  请记录上面的数据库密码，部署时需要填入 .env"
+echo "⚠️  数据库密码将在初始化后写入 /root/db-password.txt"
 echo ""
 read -p "按回车继续，或 Ctrl+C 取消..."
 
@@ -126,7 +123,22 @@ sudo systemctl enable --now redis-server
 sudo systemctl enable --now supervisor
 
 # ---------------------------------------------------------------------------
-# 10. 验证
+# 10. 保存数据库密码
+# ---------------------------------------------------------------------------
+echo ">>> 保存数据库密码到 /root/db-password.txt..."
+cat > /root/db-password.txt << DBPASS
+数据库连接信息（填入 .env）：
+  DB_CONNECTION=pgsql
+  DB_HOST=127.0.0.1
+  DB_PORT=5432
+  DB_DATABASE=${APP_DB_NAME}
+  DB_USERNAME=${APP_DB_USER}
+  DB_PASSWORD=${APP_DB_PASS}
+DBPASS
+chmod 600 /root/db-password.txt
+
+# ---------------------------------------------------------------------------
+# 11. 验证
 # ---------------------------------------------------------------------------
 echo ""
 echo "=========================================="
@@ -143,14 +155,6 @@ nginx -v 2>&1
 echo ""
 echo "下一步："
 echo "  1. 克隆项目代码到 /var/www/blog"
-echo "  2. 在 .env 中填入数据库密码：${APP_DB_PASS}"
-echo "  3. 执行 deploy/deploy.sh 部署应用"
-echo ""
-echo "数据库连接信息（填入 .env）："
-echo "  DB_CONNECTION=pgsql"
-echo "  DB_HOST=127.0.0.1"
-echo "  DB_PORT=5432"
-echo "  DB_DATABASE=${APP_DB_NAME}"
-echo "  DB_USERNAME=${APP_DB_USER}"
-echo "  DB_PASSWORD=${APP_DB_PASS}"
-echo ""
+echo "  2. 查看数据库密码：cat /root/db-password.txt"
+echo "  3. 在 .env 中填入数据库密码"
+echo "  4. 执行 deploy/deploy.sh init 部署应用"

@@ -1,7 +1,7 @@
 # 部署指南
 
 > Laravel 13 Blog 部署文档
-> 适用环境：Linux VPS（Ubuntu 22.04+ / Debian 12+）+ Nginx + PHP 8.3
+> 适用环境：Linux VPS（Ubuntu 22.04+ / Debian 12+）+ Nginx + PHP 8.4
 
 ---
 
@@ -9,36 +9,22 @@
 
 | 组件 | 版本 | 说明 |
 |------|------|------|
-| PHP | 8.3+ | 需安装扩展：fpm, cli, mbstring, xml, gd, sqlite3/mysql, zip, curl |
+| PHP | 8.3+ | 需安装扩展：fpm, cli, mbstring, xml, gd, pgsql, zip, curl, bcmath, intl, opcache |
 | Composer | 2.x | PHP 依赖管理 |
-| Node.js | 20+ | 前端构建 |
+| Node.js | 22+ | 前端构建 |
 | npm | 10+ | 随 Node.js 安装 |
 | Nginx | 1.20+ | Web 服务器 |
-| 数据库 | SQLite / MySQL 8+ / MariaDB 10.6+ | 生产推荐 MySQL |
+| PostgreSQL | 15+ | 生产数据库 |
+| Redis | 6+ | 缓存（可选） |
 
 ### 安装依赖（Ubuntu/Debian）
 
 ```bash
-# PHP 8.3 + 常用扩展
-sudo add-apt-repository ppa:ondrej/php -y
-sudo apt update
-sudo apt install -y php8.3-fpm php8.3-cli php8.3-mbstring php8.3-xml \
-    php8.3-gd php8.3-sqlite3 php8.3-mysql php8.3-zip php8.3-curl php8.3-bcmath
-
-# Composer
-curl -sS https://getcomposer.org/installer | php
-sudo mv composer.phar /usr/local/bin/composer
-
-# Node.js 20 LTS
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs
-
-# Nginx
-sudo apt install -y nginx
-
-# Supervisor（队列 worker）
-sudo apt install -y supervisor
+# 推荐：直接使用项目自带的一键初始化脚本
+sudo bash deploy/server-setup.sh
 ```
+
+脚本会自动安装 PHP 8.4 + 扩展 / Composer / Node.js 22 / PostgreSQL / Redis / Nginx / Supervisor，并创建数据库用户。
 
 ---
 
@@ -73,12 +59,12 @@ APP_ENV=production
 APP_DEBUG=false
 APP_URL=https://your-domain.com
 
-# 数据库（生产推荐 MySQL）
-DB_CONNECTION=mysql
+# 数据库（PostgreSQL）
+DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
-DB_PORT=3306
+DB_PORT=5432
 DB_DATABASE=blog
-DB_USERNAME=blog_user
+DB_USERNAME=dok4ever
 DB_PASSWORD=你的强密码
 
 # 邮件（必须配置，否则注册/找回密码功能失效）
@@ -94,27 +80,19 @@ MAIL_FROM_NAME="${APP_NAME}"
 # ALLOW_REGISTRATION=true
 ```
 
-### 3. 创建 MySQL 数据库
+### 3. 数据库（已由 server-setup.sh 自动创建）
 
-```bash
-sudo mysql
-```
-
-```sql
-CREATE DATABASE blog CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'blog_user'@'localhost' IDENTIFIED BY '你的强密码';
-GRANT ALL PRIVILEGES ON blog.* TO 'blog_user'@'localhost';
-FLUSH PRIVILEGES;
-EXIT;
-```
+如果使用 `server-setup.sh`，数据库和用户已自动创建。密码保存在 `/root/db-password.txt`。
 
 ### 4. 执行部署
 
 ```bash
-bash deploy/deploy.sh
+bash deploy/deploy.sh init
 ```
 
 脚本会自动完成：
+- 检查 `.env` 配置
+- 生成 `APP_KEY`
 - `composer install --no-dev`
 - `npm install && npm run build`
 - `php artisan migrate --force`
@@ -270,7 +248,7 @@ php artisan queue:restart
 
 **解决**：
 ```bash
-sudo systemctl status php8.3-fpm
+sudo systemctl status php8.4-fpm
 # 检查 Nginx 配置中的 fastcgi_pass 路径
 ls /run/php/
 ```
@@ -303,7 +281,7 @@ ALLOW_REGISTRATION=true
 - [ ] `.env` 中 `APP_DEBUG=false`
 - [ ] `APP_KEY` 已生成
 - [ ] `APP_URL` 指向真实域名
-- [ ] 数据库使用 MySQL（生产不推荐 SQLite）
+- [ ] 数据库使用 PostgreSQL（生产推荐）
 - [ ] `php artisan storage:link` 已执行
 - [ ] `npm run build` 已执行
 - [ ] SSL 证书已配置（HTTPS）

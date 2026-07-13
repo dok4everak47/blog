@@ -7,8 +7,9 @@
 #   2. 日常更新：bash deploy.sh
 #
 # 前提条件：
-#   - PHP 8.3+ / Composer / Node.js 20+ / npm
-#   - Nginx 或 Apache（root 指向 public/）
+#   - PHP 8.3+ / Composer / Node.js 22+ / npm
+#   - Nginx（root 指向 public/）
+#   - PostgreSQL（已通过 server-setup.sh 初始化）
 #   - 已配置好 .env 文件（首次部署时手动 cp .env.example .env 并编辑）
 # ============================================================================
 
@@ -57,10 +58,13 @@ if [[ "$1" == "init" ]]; then
         php artisan key:generate --force
     fi
 
-    # 创建 SQLite 数据库文件（如果用 SQLite）
-    if grep -q "^DB_CONNECTION=sqlite" .env && [[ ! -f database/database.sqlite ]]; then
-        info "创建 SQLite 数据库文件"
-        touch database/database.sqlite
+    # 检查数据库连接
+    if grep -q "^DB_CONNECTION=pgsql" .env; then
+        info "检测到 PostgreSQL，确认连接..."
+        if ! php artisan db:monitor > /dev/null 2>&1; then
+            warn "数据库连接失败，请检查 .env 中的 DB_* 配置"
+            warn "确认 PostgreSQL 服务已启动且数据库已创建"
+        fi
     fi
 fi
 
@@ -104,6 +108,12 @@ npm run build
 info "执行数据库迁移"
 php artisan migrate --force
 
+# 首次部署时执行 seed（创建管理员账号、分类、标签等）
+if [[ "$1" == "init" ]]; then
+    info "执行数据填充（首次部署）"
+    php artisan db:seed --force || warn "数据填充失败，可能已有数据"
+fi
+
 # ---------------------------------------------------------------------------
 # 缓存优化
 # ---------------------------------------------------------------------------
@@ -124,14 +134,6 @@ php artisan event:cache
 # ---------------------------------------------------------------------------
 info "创建 storage 软链接"
 php artisan storage:link
-
-# ---------------------------------------------------------------------------
-# 清理旧缓存
-# ---------------------------------------------------------------------------
-info "清理旧缓存"
-php artisan optimize:clear
-php artisan config:cache
-php artisan route:cache
 
 # ---------------------------------------------------------------------------
 # 权限设置

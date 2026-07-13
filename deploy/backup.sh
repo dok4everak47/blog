@@ -9,7 +9,7 @@
 #   # 每天凌晨 3 点备份
 #   0 3 * * * cd /var/www/blog && bash deploy/backup.sh >> storage/logs/backup.log 2>&1
 #
-# 支持：SQLite / MySQL
+# 支持：PostgreSQL / MySQL / SQLite
 # 保留策略：最近 30 天的备份
 # ============================================================================
 
@@ -90,6 +90,32 @@ case "$DB_CONNECTION" in
         fi
         ;;
 
+    pgsql)
+        info "PostgreSQL 数据库备份: $DB_DATABASE"
+        if command -v pg_dump &>/dev/null; then
+            PGPASSWORD="$DB_PASSWORD" pg_dump \
+                --host="${DB_HOST:-127.0.0.1}" \
+                --port="${DB_PORT:-5432}" \
+                --username="$DB_USERNAME" \
+                --format=custom \
+                --no-owner \
+                --no-privileges \
+                "$DB_DATABASE" > "${BACKUP_FILE}.dump"
+            # 同时导出纯 SQL 文本（便于人工查看）
+            PGPASSWORD="$DB_PASSWORD" pg_dump \
+                --host="${DB_HOST:-127.0.0.1}" \
+                --port="${DB_PORT:-5432}" \
+                --username="$DB_USERNAME" \
+                --format=plain \
+                --no-owner \
+                --no-privileges \
+                "$DB_DATABASE" > "$BACKUP_FILE"
+        else
+            error "pg_dump 命令不存在，请安装 postgresql-client"
+            exit 1
+        fi
+        ;;
+
     *)
         error "不支持的数据库类型: $DB_CONNECTION"
         exit 1
@@ -102,13 +128,17 @@ esac
 info "压缩备份文件"
 gzip -f "$BACKUP_FILE"
 BACKUP_FILE="${BACKUP_FILE}.gz"
+# PostgreSQL custom format 也压缩
+if [[ -f "${BACKUP_FILE%.gz}.dump" ]]; then
+    gzip -f "${BACKUP_FILE%.gz}.dump"
+fi
 info "备份完成: $BACKUP_FILE ($(du -h "$BACKUP_FILE" | cut -f1))"
 
 # ---------------------------------------------------------------------------
 # 清理过期备份
 # ---------------------------------------------------------------------------
 info "清理 ${KEEP_DAYS} 天前的旧备份"
-DELETED_COUNT=$(find "$BACKUP_DIR" -name "blog_*.gz" -mtime +$KEEP_DAYS -print -delete | wc -l)
+DELETED_COUNT=$(find "$BACKUP_DIR" -name "blog_*.gz" -o -name "blog_*.sqlite" -mtime +$KEEP_DAYS -print -delete 2>/dev/null | wc -l)
 if [[ $DELETED_COUNT -gt 0 ]]; then
     info "已删除 $DELETED_COUNT 个旧备份"
 else
