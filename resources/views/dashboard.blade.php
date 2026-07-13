@@ -121,7 +121,7 @@
             </div>
 
             {{-- 站点设置：About 页面内容（Markdown 编辑器） --}}
-            <div class="rounded-2xl border border-border bg-surface-2 p-7" x-data="aboutMarkdownEditor({{ Illuminate\Support\Js::from($aboutMarkdown) }})">
+            <div class="rounded-2xl border border-border bg-surface-2 p-6" x-data="aboutMarkdownEditor({{ Illuminate\Support\Js::from($aboutMarkdown) }})">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <p class="text-sm font-medium text-text">About 页面内容</p>
@@ -140,8 +140,8 @@
                     </div>
                 </div>
 
-                {{-- 工具栏 --}}
-                <div class="md-toolbar mb-3" role="toolbar" aria-label="Markdown 工具栏">
+                {{-- 工具栏：不顶边，普通按钮组样式 --}}
+                <div class="md-toolbar md-toolbar-contained mb-3" role="toolbar" aria-label="Markdown 工具栏">
                     <div class="md-toolbar-group">
                         <button type="button" class="md-btn md-text" title="粗体" @click="wrapSelection('**', '**', '粗体文字')"><b>B</b></button>
                         <button type="button" class="md-btn md-text" title="斜体" @click="wrapSelection('*', '*', '斜体文字')"><i>I</i></button>

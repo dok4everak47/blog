@@ -1006,3 +1006,12 @@ body {
 .cropper-disabled .cropper-line,
 .cropper-disabled .cropper-point { cursor: not-allowed; }
 .about-content hr { border: none; border-top: 1px solid var(--color-border); margin: 1.4rem 0; }
+
+/* Dashboard About 编辑器：工具栏不顶边，作为普通按钮组 */
+.md-toolbar-contained {
+    margin: 0 0 0.75rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-border);
+}
+
