@@ -1,7 +1,7 @@
 # 部署指南
 
 > Laravel 13 Blog 部署文档
-> 适用环境：Linux VPS（Ubuntu 22.04+ / Debian 12+）+ Nginx + PHP 8.4
+> 适用环境：Ubuntu 24.04 LTS + Nginx + PHP 8.4
 
 ---
 
@@ -17,7 +17,7 @@
 | PostgreSQL | 15+ | 生产数据库 |
 | Redis | 6+ | 缓存（可选） |
 
-### 安装依赖（Ubuntu/Debian）
+### 安装依赖（Ubuntu 24.04）
 
 ```bash
 # 推荐：直接使用项目自带的一键初始化脚本
