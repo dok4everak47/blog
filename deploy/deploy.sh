@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # ============================================================================
-# Laravel Blog 部署脚本
+# Laravel Blog 部署脚本（兼容 Ubuntu 22.04/24.04 和 Debian 11/12）
 # ============================================================================
 # 用法：
 #   1. 首次部署：bash deploy.sh init
 #   2. 日常更新：bash deploy.sh
 #
 # 前提条件：
-#   - PHP 8.3+ / Composer / Node.js 22+ / npm
+#   - PHP 8.4+ / Composer / Node.js 22+ / npm
 #   - Nginx（root 指向 public/）
 #   - PostgreSQL（已通过 server-setup.sh 初始化）
 #   - 已配置好 .env 文件（首次部署时手动 cp .env.example .env 并编辑）

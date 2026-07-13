@@ -9,7 +9,7 @@
 
 | 组件 | 版本 | 说明 |
 |------|------|------|
-| PHP | 8.3+ | 需安装扩展：fpm, cli, mbstring, xml, gd, pgsql, zip, curl, bcmath, intl, opcache |
+| PHP | 8.4+ | 需安装扩展：fpm, cli, mbstring, xml, gd, pgsql, zip, curl, bcmath, intl, opcache |
 | Composer | 2.x | PHP 依赖管理 |
 | Node.js | 22+ | 前端构建 |
 | npm | 10+ | 随 Node.js 安装 |

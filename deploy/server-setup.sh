@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# 服务器环境初始化脚本 — 在全新 Ubuntu 22.04/24.04 上安装运行 Laravel Blog 所需的全部依赖
+# 服务器环境初始化脚本 — 在 Ubuntu 22.04/24.04 或 Debian 11/12 上安装运行 Laravel Blog 所需的全部依赖
 #
 # 用法：
 #   chmod +x deploy/server-setup.sh
@@ -18,8 +18,21 @@ APP_DB_USER="dok4ever"
 # 生成随机密码；如需指定，改成 APP_DB_PASS="你的密码"
 APP_DB_PASS=$(openssl rand -base64 24)
 
+# ---------------------------------------------------------------------------
+# 检测系统发行版
+# ---------------------------------------------------------------------------
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    OS_ID=$ID
+    OS_CODENAME=$VERSION_CODENAME
+else
+    echo "❌ 无法检测系统发行版，请手动确认系统为 Ubuntu 或 Debian"
+    exit 1
+fi
+
 echo "=========================================="
 echo " Laravel Blog 服务器环境初始化"
+echo " 系统: ${OS_ID} ${OS_CODENAME}"
 echo "=========================================="
 echo ""
 echo "⚠️  数据库密码将在初始化后写入 /root/db-password.txt"
@@ -29,9 +42,24 @@ read -p "按回车继续，或 Ctrl+C 取消..."
 # ---------------------------------------------------------------------------
 # 1. PHP 8.4 + 扩展
 # ---------------------------------------------------------------------------
-echo ">>> 添加 ondrej PHP PPA..."
-sudo add-apt-repository ppa:ondrej/php -y
+# 安装 add-apt-repository（Debian 需要额外装 software-properties-common）
 sudo apt update
+sudo apt install -y ca-certificates lsb-release curl gnupg2 unzip git
+
+if [ "$OS_ID" = "ubuntu" ]; then
+    echo ">>> [Ubuntu] 添加 ondrej PHP PPA..."
+    sudo apt install -y software-properties-common
+    sudo add-apt-repository ppa:ondrej/php -y
+    sudo apt update
+elif [ "$OS_ID" = "debian" ]; then
+    echo ">>> [Debian] 添加 SURY PHP 仓库..."
+    sudo curl -sSLo /usr/share/keyrings/debsuryorg-archive-keyring.gpg https://packages.sury.org/debsuryorg-archive-keyring.gpg
+    echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/debian/ ${OS_CODENAME} main" | sudo tee /etc/apt/sources.list.d/sury-php.list
+    sudo apt update
+else
+    echo "❌ 不支持的发行版: $OS_ID（仅支持 Ubuntu / Debian）"
+    exit 1
+fi
 
 echo ">>> 安装 PHP 8.4 及扩展..."
 sudo apt install -y \
