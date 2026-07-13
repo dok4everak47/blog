@@ -9,7 +9,7 @@
       <div class="flex items-center gap-6">
         <a href="{{ route('home') }}" class="flex items-center gap-2 shrink-0" title="Ad Fontes Codicis">
           <span class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white text-sm font-bold">A</span>
-          <span class="text-base font-bold text-text hidden sm:inline">AFC</span>
+          <span class="text-base font-bold text-text hidden sm:inline">Ad Fontes Codicis</span>
         </a>
         <div class="hidden sm:flex items-center gap-5">
           <a href="{{ route('home') }}"
