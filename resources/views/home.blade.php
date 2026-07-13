@@ -128,7 +128,7 @@
               {{ $featured->title }}
             </h2>
             <p class="text-sm text-text-secondary line-clamp-2 leading-relaxed">
-              {{ $featured->content }}
+              {{ $featured->excerpt ?: \App\Models\Note::generateExcerpt($featured->content, 120) }}
             </p>
           </a>
         @else
