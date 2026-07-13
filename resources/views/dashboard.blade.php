@@ -584,7 +584,10 @@
                         this.previewHtml = '<pre style="padding:1rem;background:#f5f5f5;border-radius:8px;overflow:auto;font-size:13px;">' + this.escapeHtml(this.markdown || '') + '</pre>';
                         return;
                     }
-                    let html = window.marked.parse(this.markdown || '', { gfm: true, breaks: true });
+                    const normalized = (this.markdown || '')
+                        .replace(/!\s+\[([^\]]+)\]\s*\(/g, '![$1](')
+                        .replace(/!\[([^\]]+)\]\s+\(/g, '![$1](');
+                    let html = window.marked.parse(normalized, { gfm: true, breaks: true });
                     if (window.DOMPurify) html = window.DOMPurify.sanitize(html);
                     this.previewHtml = html;
                 },

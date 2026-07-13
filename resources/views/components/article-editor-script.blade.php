@@ -623,7 +623,11 @@
                     this.previewHtml = '<pre class="md-pre-fallback">' + this.escapeHtml(src) + '</pre>';
                     return;
                 }
-                let html = window.marked.parse(src, { gfm: true, breaks: true });
+                // 修复常见的手写/粘贴错误：! [alt](url) 或 ![alt] (url)
+                const normalized = src
+                    .replace(/!\s+\[([^\]]+)\]\s*\(/g, '![$1](')
+                    .replace(/!\[([^\]]+)\]\s+\(/g, '![$1](');
+                let html = window.marked.parse(normalized, { gfm: true, breaks: true });
                 if (window.DOMPurify) html = window.DOMPurify.sanitize(html);
                 this.previewHtml = html;
             },
