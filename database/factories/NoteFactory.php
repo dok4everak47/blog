@@ -21,13 +21,16 @@ class NoteFactory extends Factory
         $title = $this->faker->sentence(6);
         $content = $this->faker->paragraphs(rand(3, 8), true);
 
+        $status = $this->faker->randomElement([NoteStatus::Published, NoteStatus::Published, NoteStatus::Published, NoteStatus::Draft]);
+
         return [
             'user_id' => \App\Models\User::factory(),
             'title' => $title,
             'slug' => \Illuminate\Support\Str::slug($title) . '-' . $this->faker->unique()->numerify('####'),
             'content' => $content,
             'excerpt' => \Illuminate\Support\Str::limit(strip_tags($content), 160),
-            'status' => $this->faker->randomElement([NoteStatus::Published, NoteStatus::Published, NoteStatus::Published, NoteStatus::Draft]),
+            'status' => $status,
+            'published_at' => $status === NoteStatus::Published ? now() : null,
             'category_id' => \App\Models\Category::inRandomOrder()->first()?->id,
             'cover_image' => null,
             'thumbnail_url' => null,
@@ -41,6 +44,7 @@ class NoteFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => NoteStatus::Published,
+            'published_at' => now(),
         ]);
     }
 

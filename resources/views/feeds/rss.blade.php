@@ -18,7 +18,12 @@
             <guid isPermaLink="true">{{ route('notes.show', $note) }}</guid>
             <description>{{ \Illuminate\Support\Str::limit(strip_tags($note->content ?? ''), 300) }}</description>
             @if($note->cover_image_url)
-            <enclosure url="{{ url($note->cover_image_url) }}" type="image/jpeg"/>
+            @php
+                $ext = strtolower(pathinfo($note->cover_image, PATHINFO_EXTENSION));
+                $mimeMap = ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'gif' => 'image/gif', 'webp' => 'image/webp'];
+                $mime = $mimeMap[$ext] ?? 'image/jpeg';
+            @endphp
+            <enclosure url="{{ url($note->cover_image_url) }}" type="{{ $mime }}"/>
             @endif
             <pubDate>{{ $note->created_at->toRssString() }}</pubDate>
             @if($note->category)

@@ -19,8 +19,9 @@ class DatabaseSeeder extends Seeder
         $admin = User::factory()->create([
             'name' => 'Admin',
             'email' => 'admin@example.com',
-            'is_admin' => true,
         ]);
+        $admin->is_admin = true;
+        $admin->save();
 
         // 2. 创建分类
         $categories = \App\Models\Category::factory(6)->create();

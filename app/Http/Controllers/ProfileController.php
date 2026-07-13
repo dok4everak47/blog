@@ -39,6 +39,8 @@ class ProfileController extends Controller
 
     /**
      * Delete the user's account.
+     * 关联数据由数据库外键 cascadeOnDelete 自动处理
+     * （notes.user_id 和 comments.user_id 均 cascadeOnDelete）。
      */
     public function destroy(Request $request): RedirectResponse
     {

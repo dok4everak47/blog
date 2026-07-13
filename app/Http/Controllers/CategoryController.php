@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Note;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 class CategoryController extends Controller
@@ -27,9 +29,9 @@ class CategoryController extends Controller
      * 内联快速创建分类（编辑器内「+ 新建分类」）。
      * 返回 JSON 供前端动态插入 <option> 并选中。
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:50|unique:categories,name',
         ], [
             'name.required' => '分类名称不能为空',
@@ -37,7 +39,11 @@ class CategoryController extends Controller
             'name.unique' => '已存在同名分类',
         ]);
 
-        $category = Category::create($validated);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()->toArray()], 422);
+        }
+
+        $category = Category::create($validator->validated());
 
         return response()->json([
             'id' => $category->id,
@@ -45,4 +51,3 @@ class CategoryController extends Controller
         ]);
     }
 }
-

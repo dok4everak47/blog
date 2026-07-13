@@ -35,7 +35,7 @@ class TagController extends Controller
                 'required',
                 'string',
                 'max:30',
-                Rule::unique('tags', 'name')->whereNull('deleted_at'),
+                Rule::unique('tags', 'name'),
             ],
         ], [
             'name.required' => '标签名不能为空',

@@ -6,13 +6,14 @@ use App\Models\Note;
 use App\Models\Tag;
 use App\Models\Category;
 use App\Enums\NoteStatus;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreNoteRequest;
 use App\Http\Requests\UpdateNoteRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
@@ -74,6 +75,8 @@ class NoteController extends Controller
             $note->tags()->attach($request->tags);
         }
 
+        Cache::forget('feed.sitemap');
+
         return redirect()
             ->route('dashboard')
             ->with('success', '文章已发布！');
@@ -88,7 +91,7 @@ class NoteController extends Controller
         // Policy 双重校验：已发布→放行，草稿→仅作者（含 403/404）
         $this->authorize('view', $note);
 
-        $note->load('tags', 'category', 'comments.user', 'comments.replies.user');
+        $note->load('tags', 'category', 'user', 'comments.user', 'comments.replies.user');
 
         // 阅读统计：用 session 防刷（同一会话内不重复计数）
         $viewKey = "viewed_note_{$note->id}";
@@ -173,6 +176,8 @@ class NoteController extends Controller
 
         $note->tags()->sync($request->tags ?? []);
 
+        Cache::forget('feed.sitemap');
+
         return redirect()
             ->route('dashboard')
             ->with('success', '文章已更新！');
@@ -199,6 +204,7 @@ class NoteController extends Controller
         $attrs = [
             'title' => $data['title'] ?? '',
             'content' => $data['content'] ?? '',
+            'excerpt' => Note::generateExcerpt($data['content'] ?? ''),
             'category_id' => $data['category_id'] ?? null,
             'slug' => $this->makeSlug($data['slug'] ?? null, $data['title'] ?? '', $data['id'] ?? null),
         ];
@@ -367,6 +373,8 @@ class NoteController extends Controller
         }
 
         $note->delete();
+
+        Cache::forget('feed.sitemap');
 
         return redirect()
             ->route('dashboard')

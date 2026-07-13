@@ -6,10 +6,7 @@ $seoDescription = $note->excerpt
     ?? \App\Models\Note::generateExcerpt($note->content, 160);
 $ogImage = $note->cover_image_url
     ?? (preg_match('/!\[.*?\]\(([^)]+)\)/', $note->content ?? '', $m) ? $m[1] : null);
-// 阅读时间估算：中文约 300 字/分钟，英文约 200 词/分钟
-$textOnly = preg_replace('/[#*`\[\]()!>|\-{}]/', '', strip_tags($note->content ?? ''));
-$charCount = mb_strlen($textOnly);
-$readTime = max(1, (int) ceil($charCount / 300));
+$readTime = $note->readingMinutes();
 @endphp
 
 @section('seo')
@@ -179,7 +176,8 @@ $readTime = max(1, (int) ceil($charCount / 300));
                       <form action="{{ route('comments.destroy', $comment) }}" method="POST" class="ml-auto">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="text-xs text-text-muted hover:text-red-500 transition">删除</button>
+                        <button type="submit" class="text-xs text-text-muted hover:text-red-500 transition"
+                          onclick="return confirm('确定要删除这条评论吗？')">删除</button>
                       </form>
                     @endif
                   @endauth
@@ -288,13 +286,15 @@ $readTime = max(1, (int) ceil($charCount / 300));
     <div class="mt-10 flex flex-wrap items-center gap-4 text-sm font-medium pt-8 border-t border-border">
       <a href="{{ route('home') }}" class="text-text-secondary hover:text-primary transition">← 回首页</a>
       @auth
-        <a href="{{ route('notes.edit', $note) }}" class="text-primary hover:text-primary-hover transition">编辑</a>
-        <form action="{{ route('notes.destroy', $note) }}" method="POST" class="inline">
-          @csrf
-          @method('DELETE')
-          <button type="submit" class="text-red-600 hover:text-red-700 transition"
-            onclick="return confirm('确定要删除这篇文章吗？')">删除</button>
-        </form>
+        @if(auth()->id() === $note->user_id)
+          <a href="{{ route('notes.edit', $note) }}" class="text-primary hover:text-primary-hover transition">编辑</a>
+          <form action="{{ route('notes.destroy', $note) }}" method="POST" class="inline">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="text-red-600 hover:text-red-700 transition"
+              onclick="return confirm('确定要删除这篇文章吗？')">删除</button>
+          </form>
+        @endif
       @endauth
     </div>
   </div>
@@ -364,9 +364,12 @@ $readTime = max(1, (int) ceil($charCount / 300));
         }
     }
     window.addEventListener('scroll', updateActive, { passive: true });
-    // 初始化第一个为高亮
+    // 初始化第一个为高亮（仅设置样式，不触发 click 避免页面滚动）
     var firstLink = tocContainer.querySelector('a');
-    if (firstLink) firstLink.click();
+    if (firstLink) {
+        firstLink.classList.add('border-primary', 'bg-primary-light/40', 'text-primary', 'font-medium');
+        firstLink.classList.remove('border-transparent');
+    }
 })();
 </script>
 @endpush
