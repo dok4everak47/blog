@@ -653,7 +653,9 @@
                 const fd = new FormData();
                 fd.append('id', this.noteId || '');
                 fd.append('title', this.title);
-                fd.append('content', this.content);
+                // 保存前自动修复常见 Markdown 图片语法错误：! [alt](url) / ![alt] (url) → ![alt](url)
+                const normalized = (this.content || '').replace(/!\s*\[([^\]]+)\]\s*\(/g, '![$1](');
+                fd.append('content', normalized);
                 fd.append('category_id', this.categoryId || '');
                 fd.append('slug', this.slug || '');
                 this.selectedTags.forEach((t) => fd.append('tags[]', t));
