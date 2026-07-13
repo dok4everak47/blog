@@ -333,15 +333,15 @@
 
 | # | 任务 | 状态 |
 |---|------|------|
-| 5 | **添加 `published_at` 字段** — 支持定时发布 | ⏳ 待开发 |
-| 6 | **补充面包屑导航** — SEO + UX | ⏳ 待开发 |
-| 7 | **添加结构化数据 (JSON-LD)** — SEO | ⏳ 待开发 |
-| 8 | **robots.txt 屏蔽 /dashboard** — 安全 | ⏳ 待开发 |
-| 9 | **空状态页面** — UX | ⏳ 待开发 |
-| 10 | **阅读统计 (views)** — 功能完整性 | ⏳ 待开发 |
-| 11 | **CSP 安全头** — 安全加固 | ⏳ 待开发 |
-| 12 | **代码语法高亮（Prism.js 加载）** — 内容展示 | ⏳ 待开发 |
-| 13 | **引入 Laravel Scout 全文搜索** — 搜索性能（>1000 篇后） | ⏳ 待开发 |
+| 5 | **添加 `published_at` 字段** — 支持定时发布 | ✅ 已完成（commit `a9b8a4c`） |
+| 6 | **补充面包屑导航** — SEO + UX | ✅ 已完成（commit `a9b8a4c`） |
+| 7 | **添加结构化数据 (JSON-LD)** — SEO | ✅ 已完成（commit `a9b8a4c`） |
+| 8 | **robots.txt 屏蔽 /dashboard** — 安全 | ✅ 已确认已存在 |
+| 9 | **空状态页面** — UX | ✅ 已完成（commit `a9b8a4c`） |
+| 10 | **阅读统计 (views)** — 功能完整性 | ✅ 已完成（commit `a9b8a4c`） |
+| 11 | **CSP 安全头** — 安全加固 | ✅ 已完成（commit `a9b8a4c`） |
+| 12 | **代码语法高亮（Prism.js 加载）** — 内容展示 | ✅ 已确认已存在 |
+| 13 | **引入 Laravel Scout 全文搜索** — 搜索性能（>1000 篇后） | ⏳ 延后（需外部服务） |
 
 ### 🟢 低优先级（锦上添花）
 
@@ -361,18 +361,26 @@
 
 ## 十一、修复进度总结
 
-### 已完成（3/22）
+### 已完成（12/22）
 
 | 修复项 | Commit | 说明 |
 |--------|--------|------|
 | 移除 Note 模型 `$with` | `c5b8c6f` | 删除全局预加载，所有控制器已按需 `with()` |
 | Dashboard 用户隔离 | `e7f74c9` | `Note::forUser()` 过滤，移除不必要的 `with(['user', 'category'])` |
 | 评论查询预加载 | — | 确认控制器已有 `load('comments.user', 'comments.replies.user')`，无需修改 |
+| published_at 定时发布 | `a9b8a4c` | 新增 published_at 字段，scopePublished 增加 published_at <= now() 条件 |
+| 阅读统计 views | `a9b8a4c` | 新增 views 字段，show 方法 increment + session 防刷 |
+| 面包屑导航 | `a9b8a4c` | x-breadcrumb 组件，添加到文章/分类/标签/搜索页 |
+| JSON-LD 结构化数据 | `a9b8a4c` | Article Schema.org 标记，@@ 转义 Blade 指令 |
+| 空状态页面 | `a9b8a4c` | x-empty-state 组件，替换 5 个页面的空状态 |
+| CSP 安全头 | `a9b8a4c` | SecurityHeaders 中间件添加 Content-Security-Policy |
+| robots.txt 屏蔽后台 | — | 确认已存在，包含 dashboard/login/register/profile 等路径 |
+| 代码语法高亮 | — | 确认 Prism.js 已在 app.js 中引入并调用 highlightAll() |
 
-### 待完成（19/22）
+### 待完成（10/22）
 
 - 高优剩余 1 项（部署配置）
-- 中优 9 项
+- 中优剩余 1 项（Laravel Scout，需外部服务延后）
 - 低优 9 项
 
 > 建议先修完高优项（部署配置），然后按中优优先级依次推进。每完成一项就 commit + push。
