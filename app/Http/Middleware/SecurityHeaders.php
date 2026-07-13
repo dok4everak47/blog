@@ -28,11 +28,11 @@ class SecurityHeaders
         if (app()->environment('local')) {
             $csp = implode('; ', [
                 "default-src 'self'",
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* http://127.0.0.1:*",
-                "style-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:* https://fonts.googleapis.com",
-                "font-src 'self' data: http://localhost:* http://127.0.0.1:* https://fonts.gstatic.com",
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* http://127.0.0.1:* http://[::1]:*",
+                "style-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:* http://[::1]:* https://fonts.googleapis.com",
+                "font-src 'self' data: http://localhost:* http://127.0.0.1:* http://[::1]:* https://fonts.gstatic.com",
                 "img-src 'self' data: blob: https:",
-                "connect-src 'self' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:*",
+                "connect-src 'self' http://localhost:* http://127.0.0.1:* http://[::1]:* ws://localhost:* ws://127.0.0.1:* ws://[::1]:*",
                 "media-src 'self'",
                 "object-src 'none'",
                 "base-uri 'self'",
