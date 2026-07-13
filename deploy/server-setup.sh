@@ -149,7 +149,7 @@ sudo systemctl enable --now supervisor
 # 12. 保存数据库密码
 # ---------------------------------------------------------------------------
 echo ">>> 保存数据库密码到 /root/db-password.txt..."
-cat > /root/db-password.txt << DBPASS
+sudo tee /root/db-password.txt > /dev/null << DBPASS
 数据库连接信息（填入 .env）：
   DB_CONNECTION=pgsql
   DB_HOST=127.0.0.1
@@ -158,7 +158,7 @@ cat > /root/db-password.txt << DBPASS
   DB_USERNAME=${APP_DB_USER}
   DB_PASSWORD=${APP_DB_PASS}
 DBPASS
-chmod 600 /root/db-password.txt
+sudo chmod 600 /root/db-password.txt
 
 # ---------------------------------------------------------------------------
 # 13. 验证
