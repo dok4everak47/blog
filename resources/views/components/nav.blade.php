@@ -66,7 +66,9 @@
 
         @guest
           <a href="{{ route('login') }}" class="text-sm text-text-secondary hover:text-primary transition px-3 py-2">Login</a>
-          <a href="{{ route('register') }}" class="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover transition">Register</a>
+          @if (Route::has('register'))
+            <a href="{{ route('register') }}" class="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover transition">Register</a>
+          @endif
         @endguest
 
         @auth
@@ -126,7 +128,9 @@
       <a href="{{ route('contact') }}" class="block py-2 text-sm rounded-lg px-3 {{ request()->routeIs('contact') ? 'text-primary font-medium bg-surface' : 'text-text-secondary' }}">Contact</a>
       @guest
         <a href="{{ route('login') }}" class="block py-2 text-sm text-text-secondary px-3">Login</a>
-        <a href="{{ route('register') }}" class="block py-2 text-sm text-primary font-medium px-3">Register</a>
+        @if (Route::has('register'))
+          <a href="{{ route('register') }}" class="block py-2 text-sm text-primary font-medium px-3">Register</a>
+        @endif
       @endguest
       @auth
         <a href="{{ route('notes.create') }}" class="block py-2 text-sm rounded-lg px-3 {{ request()->routeIs('notes.create', 'notes.edit') ? 'text-primary font-medium bg-surface' : 'text-text-secondary' }}" {{ request()->routeIs('notes.create', 'notes.edit') ? 'aria-current="page"' : '' }}>✍️ 写文章</a>

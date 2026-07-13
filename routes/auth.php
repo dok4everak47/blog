@@ -12,11 +12,15 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
-    Route::get('register', [RegisteredUserController::class, 'create'])
-        ->name('register');
+    // 公开注册默认关闭（博客通常不需要开放注册）
+    // 需要开放时设置 .env: ALLOW_REGISTRATION=true
+    if (config('app.allow_registration', false)) {
+        Route::get('register', [RegisteredUserController::class, 'create'])
+            ->name('register');
 
-    Route::post('register', [RegisteredUserController::class, 'store'])
-        ->middleware('throttle:5,1');
+        Route::post('register', [RegisteredUserController::class, 'store'])
+            ->middleware('throttle:5,1');
+    }
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');

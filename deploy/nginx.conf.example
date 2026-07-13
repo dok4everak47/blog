@@ -1,0 +1,108 @@
+# ============================================================================
+# Laravel Blog Nginx 配置示例
+# ============================================================================
+# 使用方法：
+#   1. 复制到 /etc/nginx/sites-available/blog.conf
+#   2. 修改 server_name 和 root 路径
+#   3. ln -s /etc/nginx/sites-available/blog.conf /etc/nginx/sites-enabled/
+#   4. nginx -t && systemctl reload nginx
+#
+# SSL 证书申请：
+#   sudo certbot --nginx -d your-domain.com
+# ============================================================================
+
+server {
+    listen 80;
+    server_name your-domain.com www.your-domain.com;
+
+    # 强制跳转 HTTPS
+    return 301 https://your-domain.com$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name your-domain.com www.your-domain.com;
+
+    # --- SSL 证书（certbot 会自动填写） ---
+    # ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem;
+    # ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
+    # ssl_protocols TLSv1.2 TLSv1.3;
+    # ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256;
+    # ssl_prefer_server_ciphers off;
+
+    # --- 网站根目录（必须指向 public/） ---
+    root /var/www/blog/public;
+    index index.php index.html;
+
+    # --- 日志 ---
+    access_log /var/log/nginx/blog-access.log;
+    error_log  /var/log/nginx/blog-error.log;
+
+    # --- 字符集 ---
+    charset utf-8;
+
+    # --- 上传文件大小限制（封面图、文章图片） ---
+    client_max_body_size 10M;
+
+    # --- 主路由：所有请求交给 Laravel 处理 ---
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    # --- PHP-FPM 转发 ---
+    location ~ \.php$ {
+        fastcgi_pass unix:/run/php/php8.3-fpm.sock;   # Ubuntu/Debian 路径
+        # fastcgi_pass 127.0.0.1:9000;                 # CentOS/Docker 用 TCP
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        include fastcgi_params;
+        fastcgi_hide_header X-Powered-By;
+
+        # 超时设置（图片上传、长任务）
+        fastcgi_read_timeout 60;
+        fastcgi_send_timeout 60;
+    }
+
+    # --- 静态资源缓存（Vite 构建产物带 hash，可长期缓存） ---
+    location ^~ /build/ {
+        access_log off;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    # --- Storage 文件（用户上传的图片） ---
+    location ^~ /storage/ {
+        access_log off;
+        expires 30d;
+        add_header Cache-Control "public";
+        try_files $uri =404;
+    }
+
+    # --- 禁止访问敏感文件 ---
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+
+    location ~ ( composer\.(json|lock)|package\.(json|lock)|artisan|\.env|\.git ) {
+        deny all;
+    }
+
+    # --- robots.txt / sitemap.xml / feed.xml 直接返回静态文件 ---
+    location = /robots.txt {
+        access_log off;
+        try_files $uri =404;
+    }
+
+    location = /sitemap.xml {
+        access_log off;
+        try_files $uri /index.php?$query_string;
+    }
+
+    location = /feed.xml {
+        access_log off;
+        try_files $uri /index.php?$query_string;
+    }
+
+    # --- 安全响应头（Laravel 中间件已处理 CSP，这里补充 HSTS） ---
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+}

@@ -1,0 +1,32 @@
+# ============================================================================
+# Supervisor 队列 Worker 配置示例
+# ============================================================================
+# 安装 Supervisor：sudo apt install supervisor
+#
+# 使用方法：
+#   1. 复制到 /etc/supervisor/conf.d/blog-worker.conf
+#   2. 修改 user 和目录路径
+#   3. sudo supervisorctl reread && sudo supervisorctl update
+#   4. sudo supervisorctl start blog-worker:*
+#   5. 查看状态：sudo supervisorctl status
+#
+# 常用命令：
+#   sudo supervisorctl status            # 查看状态
+#   sudo supervisorctl restart all      # 重启所有
+#   php artisan queue:restart            # 优雅重启 worker（等当前任务完成）
+#   php artisan queue:failed             # 查看失败任务
+#   php artisan queue:retry all          # 重试所有失败任务
+# ============================================================================
+
+[program:blog-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /var/www/blog/artisan queue:work database --sleep=3 --tries=3 --max-time=3600 --timeout=120
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+user=www-data
+numprocs=2
+redirect_stderr=true
+stdout_logfile=/var/www/blog/storage/logs/worker.log
+stopwaitsecs=3600

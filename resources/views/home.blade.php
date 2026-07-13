@@ -240,7 +240,7 @@
                 class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-hover transition">
                 写第一篇文章
               </a>
-            @else
+            @elseif(Route::has('register'))
               <a href="{{ route('register') }}"
                 class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-hover transition">
                 注册账号开始写作

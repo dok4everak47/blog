@@ -115,8 +115,8 @@
       </article>
     @empty
       @php
-        $emptyActionText = auth()->check() ? '写第一篇文章' : '注册账号开始写作';
-        $emptyActionUrl = auth()->check() ? route('notes.create') : route('register');
+        $emptyActionText = auth()->check() ? '写第一篇文章' : '登录开始阅读';
+        $emptyActionUrl = auth()->check() ? route('notes.create') : route('login');
       @endphp
       <x-empty-state icon="article" title="还没有文章" description="写下你的第一篇文章吧"
           action-text="{{ $emptyActionText }}" :action-url="$emptyActionUrl" />

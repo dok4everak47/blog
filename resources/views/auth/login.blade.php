@@ -47,10 +47,12 @@
             </x-primary-button>
 
             <p class="mt-4 text-center text-sm text-text-secondary">
-                {{ __('还没有账号？') }}
-                <a href="{{ route('register') }}" class="font-medium text-primary hover:text-primary-hover transition">
-                    {{ __('注册') }}
-                </a>
+                @if (Route::has('register'))
+                    {{ __('还没有账号？') }}
+                    <a href="{{ route('register') }}" class="font-medium text-primary hover:text-primary-hover transition">
+                        {{ __('注册') }}
+                    </a>
+                @endif
             </p>
         </div>
     </form>
