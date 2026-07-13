@@ -103,7 +103,8 @@
             },
 
             onChange() {
-                // 同步最新正文（修复自动保存读取旧内容的隐患）
+                // 同步最新标题和正文（修复自动保存读取旧值的隐患）
+                this.title = this.$refs.title.value;
                 this.content = this.$refs.content.value;
                 this.errors = [];
                 this.dirty = true;
