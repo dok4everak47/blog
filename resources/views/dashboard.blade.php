@@ -121,7 +121,7 @@
             </div>
 
             {{-- 站点设置：About 页面内容（Markdown 编辑器） --}}
-            <div class="rounded-2xl border border-border bg-surface-2 p-5 sm:p-6" x-data="aboutMarkdownEditor({{ Illuminate\Support\Js::from($aboutMarkdown) }})">
+            <div class="rounded-2xl border border-border bg-surface-2 p-7" x-data="aboutMarkdownEditor({{ Illuminate\Support\Js::from($aboutMarkdown) }})">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <p class="text-sm font-medium text-text">About 页面内容</p>
