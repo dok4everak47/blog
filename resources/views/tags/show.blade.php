@@ -10,6 +10,7 @@
 
 @section('content')
   <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <x-breadcrumb :items="[['label' => '标签', 'url' => route('notes.index')], ['label' => '#' . $tag->name]]" />
     {{-- 页头 --}}
     <div class="flex items-center justify-between mb-8">
       <div>
@@ -18,8 +19,6 @@
       </div>
       <span class="text-sm text-text-secondary">共 {{ $notes->total() }} 篇</span>
     </div>
-
-    <a href="{{ route('home') }}" class="inline-flex items-center gap-1 text-sm text-text-secondary hover:text-primary transition mb-8">← 回首页</a>
 
     {{-- 文章列表 --}}
     @forelse ($notes as $note)
@@ -58,9 +57,7 @@
         </a>
       </article>
     @empty
-      <div class="rounded-2xl border border-dashed border-border p-16 text-center bg-surface-2">
-        <p class="text-text-secondary">该标签下还没有文章</p>
-      </div>
+      <x-empty-state icon="article" title="该标签下还没有文章" description="换个标签看看？" />
     @endforelse
 
     {{-- 分页 --}}

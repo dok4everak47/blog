@@ -3,6 +3,7 @@
 
 @section('content')
   <main class="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+    <x-breadcrumb :items="[['label' => '搜索']]" />
     {{-- 页头 + 搜索框 --}}
     <div class="mb-10">
       <p class="text-xs font-medium tracking-[0.2em] text-primary uppercase mb-2">Search</p>
@@ -45,10 +46,7 @@
           </a>
         </article>
       @empty
-        <div class="rounded-2xl border border-dashed border-border p-16 text-center bg-surface-2">
-          <p class="text-text-secondary mb-2">没有找到相关文章</p>
-          <p class="text-xs text-text-muted">试试换个关键词？</p>
-        </div>
+        <x-empty-state icon="search" title="没有找到相关文章" description="试试换个关键词？" />
       @endforelse
 
       {{-- 分页 --}}
@@ -68,9 +66,7 @@
         </nav>
       @endif
     @else
-      <div class="rounded-2xl border border-dashed border-border p-16 text-center bg-surface-2">
-        <p class="text-text-secondary">输入关键词开始搜索</p>
-      </div>
+      <x-empty-state icon="search" title="输入关键词开始搜索" description="搜索文章标题或正文内容" />
     @endif
   </main>
 @endsection

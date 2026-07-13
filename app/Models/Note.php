@@ -13,12 +13,13 @@ class Note extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'content', 'category_id', 'user_id', 'status', 'slug', 'cover_image', 'thumbnail_url', 'excerpt'];
+    protected $fillable = ['title', 'content', 'category_id', 'user_id', 'status', 'slug', 'cover_image', 'thumbnail_url', 'excerpt', 'published_at', 'views'];
 
     protected function casts(): array
     {
         return [
             'status' => NoteStatus::class,
+            'published_at' => 'datetime',
         ];
     }
 
@@ -37,10 +38,14 @@ class Note extends Model
 
     /**
      * 仅查询已发布文章（前台公开访问用）
+     * status = published 且 published_at <= 当前时间（支持定时发布）
      */
     public function scopePublished($query)
     {
-        return $query->where('status', NoteStatus::Published->value);
+        return $query->where('status', NoteStatus::Published->value)
+            ->where(function ($q) {
+                $q->whereNull('published_at')->orWhere('published_at', '<=', now());
+            });
     }
 
     /**

@@ -32,10 +32,41 @@ $readTime = max(1, (int) ceil($charCount / 300));
 @if($ogImage)
 <meta name="twitter:image" content="{{ url($ogImage) }}">
 @endif
+
+{{-- JSON-LD 结构化数据 --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "Article",
+  "headline": {{ json_encode($note->title) }},
+  "description": {{ json_encode($seoDescription) }},
+  "datePublished": "{{ $note->published_at?->toIso8601String() ?? $note->created_at->toIso8601String() }}",
+  "dateModified": "{{ $note->updated_at->toIso8601String() }}",
+  "author": {
+    "@@type": "Person",
+    "name": {{ json_encode($note->user->name ?? 'Anonymous') }}
+  },
+  "publisher": {
+    "@@type": "Organization",
+    "name": {{ json_encode(config('app.name', 'My Blog')) }}
+  },
+  "mainEntityOfPage": {
+    "@@type": "WebPage",
+    "@@id": "{{ route('notes.show', $note) }}"
+  }
+  @if($ogImage)
+  , "image": "{{ url($ogImage) }}"
+  @endif
+  @if($note->category)
+  , "articleSection": {{ json_encode($note->category->name) }}
+  @endif
+}
+</script>
 @endsection
 
 @section('content')
   <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+    <x-breadcrumb :items="[['label' => '全部文章', 'url' => route('notes.index')], ['label' => $note->title]]" />
     <div class="flex gap-10">
 
       {{-- ====== 左侧文章主体 ====== --}}
@@ -70,6 +101,14 @@ $readTime = max(1, (int) ceil($charCount / 300));
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.25 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
           </svg>
           约 {{ $readTime }} 分钟阅读
+        </span>
+        <span class="text-border-strong">·</span>
+        <span class="inline-flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+          </svg>
+          {{ $note->views }} 次阅读
         </span>
       </div>
 

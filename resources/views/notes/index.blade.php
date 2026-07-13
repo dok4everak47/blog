@@ -10,6 +10,7 @@
 
 @section('content')
   <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <x-breadcrumb :items="[['label' => '全部文章']]" />
     {{-- 页头 --}}
     <div class="flex items-center justify-between mb-8">
       <div>
@@ -113,18 +114,12 @@
         </div>
       </article>
     @empty
-      <div class="rounded-2xl border border-dashed border-border p-16 text-center bg-surface-2">
-        <p class="text-text-secondary mb-2">还没有文章</p>
-        @auth
-          <a href="{{ route('notes.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-hover transition">
-            写第一篇文章
-          </a>
-        @else
-          <a href="{{ route('register') }}" class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-hover transition">
-            注册账号开始写作
-          </a>
-        @endauth
-      </div>
+      @php
+        $emptyActionText = auth()->check() ? '写第一篇文章' : '注册账号开始写作';
+        $emptyActionUrl = auth()->check() ? route('notes.create') : route('register');
+      @endphp
+      <x-empty-state icon="article" title="还没有文章" description="写下你的第一篇文章吧"
+          action-text="{{ $emptyActionText }}" :action-url="$emptyActionUrl" />
     @endforelse
 
     {{-- 分页 --}}

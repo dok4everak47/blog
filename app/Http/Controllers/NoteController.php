@@ -56,13 +56,16 @@ class NoteController extends Controller
         // 生成缩略图
         $thumbnail = $cover ? Note::generateThumbnail($cover) : null;
 
+        $status = $request->input('status', 'published');
+
         $note = auth()->user()->notes()->create([
             'title' => $request->title,
             'content' => $request->content,
             'excerpt' => $request->filled('excerpt') ? $request->excerpt : Note::generateExcerpt($request->content),
             'category_id' => $request->category_id,
             'slug' => $this->makeSlug($request->slug, $request->title, null),
-            'status' => $request->input('status', 'published'),
+            'status' => $status,
+            'published_at' => $status === 'published' ? now() : null,
             'cover_image' => $cover,
             'thumbnail_url' => $thumbnail,
         ]);
@@ -86,6 +89,13 @@ class NoteController extends Controller
         $this->authorize('view', $note);
 
         $note->load('tags', 'category', 'comments.user', 'comments.replies.user');
+
+        // 阅读统计：用 session 防刷（同一会话内不重复计数）
+        $viewKey = "viewed_note_{$note->id}";
+        if (!session($viewKey)) {
+            $note->increment('views');
+            session([$viewKey => true]);
+        }
 
         // 上一篇 / 下一篇（仅已发布）
         $previous = Note::published()->where('id', '<', $note->id)->latest('id')->first();
@@ -122,14 +132,21 @@ class NoteController extends Controller
     {
         $this->authorize('update', $note);
 
+        $status = $request->input('status', $note->status?->value ?? 'published');
+
         $data = [
             'title' => $request->title,
             'content' => $request->content,
             'excerpt' => $request->filled('excerpt') ? $request->excerpt : Note::generateExcerpt($request->content),
             'category_id' => $request->category_id,
             'slug' => $this->makeSlug($request->slug, $request->title, $note->id),
-            'status' => $request->input('status', $note->status?->value ?? 'published'),
+            'status' => $status,
         ];
+
+        // 草稿转发布时设置 published_at；发布转草稿时保留原 published_at
+        if ($status === 'published' && !$note->published_at) {
+            $data['published_at'] = now();
+        }
 
         // 封面图：上传新图 / 移除旧图
         if ($request->hasFile('cover_image')) {
