@@ -86,7 +86,7 @@
                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
               </svg>
             </button>
-            <div x-show="userMenu" x-transition
+            <div x-show="userMenu" x-transition x-cloak
               class="absolute right-0 mt-2 w-44 rounded-xl border border-border bg-surface-2 shadow-sm overflow-hidden">
               <a href="{{ route('profile.edit') }}" class="block px-4 py-2.5 text-sm text-text hover:bg-surface hover:text-primary transition">Profile</a>
               <form method="POST" action="{{ route('logout') }}">
