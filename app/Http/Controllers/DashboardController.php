@@ -19,12 +19,12 @@ class DashboardController extends Controller
      */
     public function index(): View
     {
-        $notes = Note::with(['user', 'category'])
+        $notes = Note::forUser()
             ->latest()
             ->take(5)
             ->get();
 
-        $notesCount = Note::count();
+        $notesCount = Note::forUser()->count();
         $categoriesCount = Category::count();
         $tagsCount = Tag::count();
         $heroImage = SiteSetting::get('hero_image');
