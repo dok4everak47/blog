@@ -98,7 +98,7 @@
       {{-- Welcome Card --}}
       <div class="rounded-2xl border border-border bg-surface-2 p-8 sm:p-10 flex flex-col justify-center">
         <p class="text-xs font-medium tracking-[0.2em] text-primary uppercase mb-4">Welcome</p>
-        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-3">My Blog</h1>
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-3">Ad Fontes Codicis</h1>
         <p class="text-sm text-text-secondary mb-6">Personal Blog</p>
         <div class="border-t border-border pt-5 mt-auto">
           <p class="text-xs font-medium tracking-[0.15em] text-primary uppercase mb-2">Overview</p>

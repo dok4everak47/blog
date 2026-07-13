@@ -77,7 +77,7 @@
 
             {{-- 摘要 --}}
             <p class="text-sm text-text-secondary line-clamp-2 leading-relaxed">
-              {{ strip_tags(Str::markdown($note->content ?? '')) }}
+              {{ $note->excerpt ?: \App\Models\Note::generateExcerpt($note->content, 120) }}
             </p>
           </div>
 
