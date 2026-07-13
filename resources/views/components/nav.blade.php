@@ -1,4 +1,8 @@
-<nav x-data="{ open: false }" class="sticky top-0 z-50 bg-surface-2/70 backdrop-blur-md border-b border-border">
+<nav x-data="{ open: false, searchOpen: false }"
+     @keydown.cmd.k.prevent="searchOpen = true"
+     @keydown.ctrl.k.prevent="searchOpen = true"
+     @keydown.escape.window="searchOpen = false"
+     class="sticky top-0 z-50 bg-surface-2/70 backdrop-blur-md border-b border-border">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
       {{-- Left: Logo + public links --}}
@@ -27,15 +31,59 @@
         </div>
       </div>
 
-      {{-- 中间：搜索框（桌面端） --}}
-      <form action="{{ route('search') }}" method="GET" class="relative hidden sm:block flex-1 max-w-xs">
-        <input type="text" name="q" value="{{ request('q') }}"
-               placeholder="搜索文章…"
-               class="w-full rounded-lg border border-border bg-surface px-3 py-1.5 pl-9 text-sm text-text outline-none transition focus:border-primary focus:bg-surface-2 focus:ring-2 focus:ring-primary/10">
-        <svg class="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-        </svg>
-      </form>
+      {{-- 中间：搜索按钮（桌面端，点击弹出悬浮搜索框） --}}
+      <div class="hidden sm:flex items-center">
+        <button @click="searchOpen = true"
+                class="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-text-muted hover:border-primary hover:text-primary transition"
+                aria-label="搜索文章">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <span>搜索文章…</span>
+          <kbd class="ml-2 hidden md:inline-flex items-center gap-0.5 rounded border border-border bg-surface-2 px-1.5 py-0.5 text-[10px] text-text-muted font-mono">⌘K</kbd>
+        </button>
+      </div>
+
+      {{-- 悬浮搜索弹窗（桌面端，挂在 nav 层级） --}}
+      <div x-show="searchOpen"
+           x-transition:enter="transition ease-out duration-200"
+           x-transition:enter-start="opacity-0"
+           x-transition:enter-end="opacity-100"
+           x-transition:leave="transition ease-in duration-150"
+           x-transition:leave-start="opacity-100"
+           x-transition:leave-end="opacity-0"
+           x-cloak
+           class="fixed inset-0 z-[60] hidden sm:flex items-start justify-center pt-[15vh] px-4"
+           @click.self="searchOpen = false">
+        {{-- 背景遮罩 --}}
+        <div class="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
+        {{-- 搜索面板 --}}
+        <div class="relative w-full max-w-xl rounded-2xl border border-border bg-surface-2 shadow-2xl overflow-hidden"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-2">
+          <form action="{{ route('search') }}" method="GET" class="flex items-center gap-3 border-b border-border px-4">
+            <svg class="w-5 h-5 text-text-muted shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input type="text" name="q" value="{{ request('q') }}"
+                   x-ref="searchInput"
+                   placeholder="搜索文章标题或正文…"
+                   x-init="$watch('searchOpen', v => v ? setTimeout(() => { $refs.searchInput.focus(); $refs.searchInput.select(); }, 100) : null)"
+                   class="w-full bg-transparent py-4 text-base text-text outline-none placeholder:text-text-muted">
+            <button type="button" @click="searchOpen = false"
+                    class="shrink-0 rounded-lg border border-border bg-surface px-2 py-1 text-xs text-text-muted hover:text-primary hover:border-primary transition">
+              ESC
+            </button>
+          </form>
+          <div class="px-4 py-3 text-xs text-text-muted">
+            输入关键词后按回车搜索
+          </div>
+        </div>
+      </div>
 
       {{-- Right: theme toggle + auth state --}}
       <div class="hidden sm:flex items-center gap-3">
