@@ -85,9 +85,17 @@
                 };
                 window.addEventListener('keydown', this._keyHandler);
 
-                // 离开页面提示
+                // 离开页面：有未保存内容时先同步保存再弹提示
                 this._unload = (e) => {
                     if (this.dirty) {
+                        // 同步标题和正文到 Alpine 状态，确保 sendBeacon 拿到最新值
+                        this.title = this.$refs.title.value;
+                        this.content = this.$refs.content.value;
+                        this.categoryId = this.$refs.category.value;
+                        // 用 sendBeacon 同步发送（FormData 中带 _token 绕过 CSRF）
+                        const fd = this.buildFormData();
+                        fd.append('_token', document.querySelector('meta[name="csrf-token"]')?.content || '');
+                        navigator.sendBeacon(this.$root.dataset.autosaveUrl, fd);
                         e.preventDefault();
                         e.returnValue = '';
                     }
