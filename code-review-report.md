@@ -1,6 +1,7 @@
 # Laravel Blog 全面代码审计报告
 
-> 审计日期：2026-07-13  
+> 审计日期：2026-07-13
+> 最后更新：2026-07-13（已标注修复进度）
 > 审计范围：功能完整性 · 最佳实践 · 数据库设计 · UI/UX · SEO · 性能 · 安全 · 部署就绪度
 
 ---
@@ -16,11 +17,14 @@
 - GD 缩略图生成 + 图片懒加载
 - 暗黑模式 + SEO meta + SST + RSS 一应俱全
 
-**核心短板：**
-- Note 模型 `$with` 属性造成不必要的 N+1 查询风险
-- 缺少阅读统计、定时发布、面包屑等体验增强功能
-- 没有缓存策略（路由/配置/HTTP 缓存）
-- Dashboard 用户隔离不完整
+**核心短板（审计时发现，现已部分修复）：**
+
+| 短板 | 状态 |
+|------|------|
+| Note 模型 `$with` 属性造成不必要的 N+1 查询风险 | ✅ 已修复（commit `c5b8c6f`） |
+| Dashboard 用户隔离不完整 | ✅ 已修复（commit `e7f74c9`） |
+| 缺少阅读统计、定时发布、面包屑等体验增强功能 | ⏳ 待开发 |
+| 没有缓存策略（路由/配置/HTTP 缓存） | ⏳ 部署阶段处理 |
 
 ---
 
@@ -69,12 +73,12 @@
 
 ### ⚠️ 建议优化
 
-| 功能 | 问题 | 建议 |
-|------|------|------|
-| Note 模型 `$with` | 全局预加载 `category` + `user`，所有查询都会 join | 移除 `$with`，在 Controller 中按需 `with()` |
-| Dashboard 用户隔离 | `DashboardController::index()` 显示**所有用户**的文章 | 加 `where('user_id', auth()->id())` |
-| 评论加载 | `$note->comments` 懒加载，缺少 `.user` 预加载 | `$note->comments()->with('user', 'replies.user')->get()` |
-| 搜索功能 | LIKE 模糊搜索，大数据量下性能差 | 接入 Laravel Scout + Meilisearch（≥1000 篇后） |
+| 功能 | 问题 | 建议 | 状态 |
+|------|------|------|------|
+| ~~Note 模型 `$with`~~ | ~~全局预加载 `category` + `user`，所有查询都会 join~~ | ~~移除 `$with`，在 Controller 中按需 `with()`~~ | ✅ 已修复（commit `c5b8c6f`） |
+| ~~Dashboard 用户隔离~~ | ~~`DashboardController::index()` 显示**所有用户**的文章~~ | ~~加 `where('user_id', auth()->id())`~~ | ✅ 已修复（commit `e7f74c9`） |
+| ~~评论加载~~ | ~~`$note->comments` 懒加载，缺少 `.user` 预加载~~ | ~~`$note->comments()->with('user', 'replies.user')->get()`~~ | ✅ 确认已无需修改（控制器已有 `load('comments.user', 'comments.replies.user')`） |
+| 搜索功能 | LIKE 模糊搜索，大数据量下性能差 | 接入 Laravel Scout + Meilisearch（≥1000 篇后） | ⏳ 待优化 |
 
 ### ❌ 缺失功能
 
@@ -103,43 +107,43 @@
 
 ### ✅ 做得好的
 
-1. **Routes → Resource Controller 风格**  
+1. **Routes → Resource Controller 风格**
    路由命名规范（`notes.index`, `notes.show`），分组清晰（公开/认证/管理）
 
-2. **Controllers**  
+2. **Controllers**
    方法职责单一，控制器体量适中
 
-3. **Models**  
+3. **Models**
    - 有 Scope（`published()`, `draft()`, `forUser()`）
    - 有 Accessor（`cover_image_url`, `thumbnail_url`）
    - 有 Cast（NoteStatus Enum）
    - 关联关系完整
 
-4. **Policies**  
+4. **Policies**
    NotePolicy 和 CommentPolicy 设计正确，view() 允许 null user（访客）
 
-5. **Form Requests**  
+5. **Form Requests**
    StoreNoteRequest, UpdateNoteRequest, StoreCommentRequest 均存在
 
-6. **Middleware**  
+6. **Middleware**
    SecurityHeaders（全局）+ EnsureUserIsAdmin（路由级别）
 
-7. **Blade 组件**  
+7. **Blade 组件**
    x-nav, x-footer, 多个页面组件，结构清晰
 
-8. **Enum**  
+8. **Enum**
    NoteStatus 是纯正的 Backed Enum，附带 label() 和 isPublic()
 
 ### ⚠️ 建议改进
 
-| 问题 | 位置 | 建议 |
-|------|------|------|
-| **`$with` 全局预加载** | Note.php:18 | 移除 `protected $with = ['category', 'user']`，改为按需 `with()` |
-| **TagController 使用 Validator** | TagController.php:33 | 改用 Form Request |
-| **DashboardController 内联验证** | DashboardController.php:50,84 | 改用 Form Request |
-| **CommentController 中手动 authorize** | CommentController.php | 可以用 `$this->authorize()` |
-| **无 Service 层** | 全部 | 当前规模可以接受，但如果逻辑继续增长建议抽取 Action/Service 类 |
-| **Search 查询拼接** | SearchController | 低风险（Eloquent 参数绑定），但可考虑全文索引 |
+| 问题 | 位置 | 建议 | 状态 |
+|------|------|------|------|
+| ~~`$with` 全局预加载~~ | ~~Note.php:18~~ | ~~移除 `protected $with = ['category', 'user']`，改为按需 `with()`~~ | ✅ 已修复（commit `c5b8c6f`） |
+| TagController 使用 Validator | TagController.php:33 | 改用 Form Request | ⏳ 待优化 |
+| DashboardController 内联验证 | DashboardController.php:50,84 | 改用 Form Request | ⏳ 待优化 |
+| CommentController 中手动 authorize | CommentController.php | 可以用 `$this->authorize()` | ⏳ 待优化 |
+| 无 Service 层 | 全部 | 当前规模可以接受，但如果逻辑继续增长建议抽取 Action/Service 类 | ⏳ 视情况 |
+| Search 查询拼接 | SearchController | 低风险（Eloquent 参数绑定），但可考虑全文索引 | ⏳ 待优化 |
 
 ---
 
@@ -244,16 +248,16 @@
 
 ### ⚠️ 性能优化建议
 
-| 优化项 | 优先级 | 说明 | 方案 |
-|--------|--------|------|------|
-| **移除 `$with`** | 🔴 **高** | Note 每次查询都 join category+user，即使不需要 | 移除 `$with`，控制器显式 `with()` |
-| **评论查询 N+1** | 🟡 中 | `$note->comments` 懒加载 user 和 replies | `->with('user', 'replies.user')` |
-| **HTTP 缓存** | 🟡 中 | 公开页面无 Cache-Control 头 | 对首页/文章详情加 `Cache-Control: public, max-age=3600` |
-| **路由缓存** | 🟡 中 | 生产环境必做 | `php artisan route:cache` |
-| **配置缓存** | 🟡 中 | 生产环境必做 | `php artisan config:cache` |
-| **图片格式** | 🟢 低 | 上传 jpg/png 可以转 WebP | GD 支持 WebP 输出 |
-| **RSS 缓存** | 🟢 低 | 当前无缓存 | 添加 Cache::remember 或 HTTP 层缓存 |
-| **HTML 压缩** | 🟢 低 | Blade 输出可压缩 | 中间件或 nginx gzip |
+| 优化项 | 优先级 | 说明 | 方案 | 状态 |
+|--------|--------|------|------|------|
+| ~~移除 `$with`~~ | ~~🔴 **高**~~ | ~~Note 每次查询都 join category+user，即使不需要~~ | ~~移除 `$with`，控制器显式 `with()`~~ | ✅ 已修复（commit `c5b8c6f`） |
+| ~~评论查询 N+1~~ | ~~🟡 中~~ | ~~`$note->comments` 懒加载 user 和 replies~~ | ~~`->with('user', 'replies.user')`~~ | ✅ 确认已无需修改（控制器已有 `load('comments.user', 'comments.replies.user')`） |
+| HTTP 缓存 | 🟡 中 | 公开页面无 Cache-Control 头 | 对首页/文章详情加 `Cache-Control: public, max-age=3600` | ⏳ 待优化 |
+| 路由缓存 | 🟡 中 | 生产环境必做 | `php artisan route:cache` | ⏳ 部署阶段 |
+| 配置缓存 | 🟡 中 | 生产环境必做 | `php artisan config:cache` | ⏳ 部署阶段 |
+| 图片格式 | 🟢 低 | 上传 jpg/png 可以转 WebP | GD 支持 WebP 输出 | ⏳ 待优化 |
+| RSS 缓存 | 🟢 低 | 当前无缓存 | 添加 Cache::remember 或 HTTP 层缓存 | ⏳ 待优化 |
+| HTML 压缩 | 🟢 低 | Blade 输出可压缩 | 中间件或 nginx gzip | ⏳ 待优化 |
 
 ---
 
@@ -272,6 +276,7 @@
 | Security Headers | ✅ | X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy |
 | 草稿隐私 | ✅ | 草稿仅作者可见（Policy + Scope 双重保障） |
 | admin 中间件 | ✅ | EnsureUserIsAdmin |
+| Dashboard 用户隔离 | ✅ | `Note::forUser()` 过滤（commit `e7f74c9` 修复） |
 
 ### ⚠️ 安全建议
 
@@ -317,45 +322,57 @@
 
 ### 🔴 高优先级（上线前 / 近期必做）
 
-1. **移除 Note 模型的 `$with`** — 性能影响
-2. **Dashboard 用户隔离** — 安全/隐私
-3. **评论查询预加载优化** — 性能
-4. **`.env` 生产配置 + 缓存优化** — 部署就绪
+| # | 任务 | 状态 |
+|---|------|------|
+| 1 | **移除 Note 模型的 `$with`** — 性能影响 | ✅ 已完成（commit `c5b8c6f`） |
+| 2 | **Dashboard 用户隔离** — 安全/隐私 | ✅ 已完成（commit `e7f74c9`） |
+| 3 | **评论查询预加载优化** — 性能 | ✅ 确认已无需修改（代码已正确） |
+| 4 | **`.env` 生产配置 + 缓存优化** — 部署就绪 | ⏳ 部署阶段处理 |
 
 ### 🟡 中优先级（迭代优化）
 
-5. **添加 `published_at` 字段** — 支持定时发布
-6. **补充面包屑导航** — SEO + UX
-7. **添加结构化数据 (JSON-LD)** — SEO
-8. **robots.txt 屏蔽 /dashboard** — 安全
-9. **空状态页面** — UX
-10. **阅读统计 (views)** — 功能完整性
-11. **CSP 安全头** — 安全加固
-12. **代码语法高亮（Prism.js 加载）** — 内容展示
-13. **引入 Laravel Scout 全文搜索** — 搜索性能（>1000 篇后）
+| # | 任务 | 状态 |
+|---|------|------|
+| 5 | **添加 `published_at` 字段** — 支持定时发布 | ⏳ 待开发 |
+| 6 | **补充面包屑导航** — SEO + UX | ⏳ 待开发 |
+| 7 | **添加结构化数据 (JSON-LD)** — SEO | ⏳ 待开发 |
+| 8 | **robots.txt 屏蔽 /dashboard** — 安全 | ⏳ 待开发 |
+| 9 | **空状态页面** — UX | ⏳ 待开发 |
+| 10 | **阅读统计 (views)** — 功能完整性 | ⏳ 待开发 |
+| 11 | **CSP 安全头** — 安全加固 | ⏳ 待开发 |
+| 12 | **代码语法高亮（Prism.js 加载）** — 内容展示 | ⏳ 待开发 |
+| 13 | **引入 Laravel Scout 全文搜索** — 搜索性能（>1000 篇后） | ⏳ 待开发 |
 
 ### 🟢 低优先级（锦上添花）
 
-14. **作者页面** — 多作者展示
-15. **文章软删除** — 误删恢复
-16. **评论审核机制** — 内容安全
-17. **Skeleton Loading** — 加载体验
-18. **图片 WebP 转换** — 性能优化
-19. **社交分享按钮** — 传播
-20. **Newsletter 订阅** — 用户留存
-21. **文章归档页** — 内容组织
-22. **置顶 / 点赞** — 互动
+| # | 任务 | 状态 |
+|---|------|------|
+| 14 | **作者页面** — 多作者展示 | ⏳ 待开发 |
+| 15 | **文章软删除** — 误删恢复 | ⏳ 待开发 |
+| 16 | **评论审核机制** — 内容安全 | ⏳ 待开发 |
+| 17 | **Skeleton Loading** — 加载体验 | ⏳ 待开发 |
+| 18 | **图片 WebP 转换** — 性能优化 | ⏳ 待开发 |
+| 19 | **社交分享按钮** — 传播 | ⏳ 待开发 |
+| 20 | **Newsletter 订阅** — 用户留存 | ⏳ 待开发 |
+| 21 | **文章归档页** — 内容组织 | ⏳ 待开发 |
+| 22 | **置顶 / 点赞** — 互动 | ⏳ 待开发 |
 
 ---
 
-## 十一、总结
+## 十一、修复进度总结
 
-你的 Laravel Blog 项目代码质量**显著优于新手平均水平**。Policies、Enum、Security Headers、Rate Limiting 等基础设施都搭得扎实。从零基础起步到这个程度，产出相当不错。
+### 已完成（3/22）
 
-当前最需要关注的是：
+| 修复项 | Commit | 说明 |
+|--------|--------|------|
+| 移除 Note 模型 `$with` | `c5b8c6f` | 删除全局预加载，所有控制器已按需 `with()` |
+| Dashboard 用户隔离 | `e7f74c9` | `Note::forUser()` 过滤，移除不必要的 `with(['user', 'category'])` |
+| 评论查询预加载 | — | 确认控制器已有 `load('comments.user', 'comments.replies.user')`，无需修改 |
 
-1. **性能**：`$with` 是最大的性能隐患，必须移除
-2. **部署**：补完生产环境配置和缓存就可以上线了
-3. **体验**：面包屑 + 空状态 + 代码高亮是"看起来像正经博客"的最后拼图
+### 待完成（19/22）
 
-> 如果你准备继续迭代，建议先修高优项，然后每迭代一个中优项就 push 一次。当前项目已经具备上线运行的基础条件。
+- 高优剩余 1 项（部署配置）
+- 中优 9 项
+- 低优 9 项
+
+> 建议先修完高优项（部署配置），然后按中优优先级依次推进。每完成一项就 commit + push。
