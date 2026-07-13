@@ -23,20 +23,35 @@ class SecurityHeaders
         $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
 
         // Content-Security-Policy
-        // 'unsafe-inline' for styles: Tailwind/Vite inline styles + Alpine x-cloak
-        // 'unsafe-inline' for scripts: Vite dev + inline scripts (theme toggle, TOC)
-        $csp = implode('; ', [
-            "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-            "font-src 'self' data: https://fonts.gstatic.com",
-            "img-src 'self' data: blob: https:",
-            "connect-src 'self'",
-            "media-src 'self'",
-            "object-src 'none'",
-            "base-uri 'self'",
-            "form-action 'self'",
-        ]);
+        // 开发环境：Vite dev server 从不同端口加载资源，需要放宽限制
+        // 生产环境：严格 CSP，只允许 self
+        if (app()->environment('local')) {
+            $csp = implode('; ', [
+                "default-src 'self'",
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* http://127.0.0.1:*",
+                "style-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:* https://fonts.googleapis.com",
+                "font-src 'self' data: http://localhost:* http://127.0.0.1:* https://fonts.gstatic.com",
+                "img-src 'self' data: blob: https:",
+                "connect-src 'self' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:*",
+                "media-src 'self'",
+                "object-src 'none'",
+                "base-uri 'self'",
+                "form-action 'self'",
+            ]);
+        } else {
+            $csp = implode('; ', [
+                "default-src 'self'",
+                "script-src 'self' 'unsafe-inline'",
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+                "font-src 'self' data: https://fonts.gstatic.com",
+                "img-src 'self' data: blob: https:",
+                "connect-src 'self'",
+                "media-src 'self'",
+                "object-src 'none'",
+                "base-uri 'self'",
+                "form-action 'self'",
+            ]);
+        }
         $response->headers->set('Content-Security-Policy', $csp);
 
         return $response;
