@@ -446,6 +446,11 @@
                     const f = e.target.files && e.target.files[0];
                     if (!f) return;
                     window.openImageCropper(f).then(croppedBlob => {
+                        if (!croppedBlob) {
+                            this.error = '裁剪失败，未获取到图片';
+                            e.target.value = '';
+                            return;
+                        }
                         if (this.currentUrl && this.currentUrl.startsWith('blob:')) {
                             URL.revokeObjectURL(this.currentUrl);
                         }
@@ -454,7 +459,9 @@
                         this.error = null;
                         this.success = null;
                         this.save();
-                    }).catch(() => {
+                    }).catch((err) => {
+                        if (err && err.message && err.message.includes('取消')) return;
+                        this.error = (err && err.message) ? err.message : '图片处理失败';
                         e.target.value = '';
                     });
                 },
