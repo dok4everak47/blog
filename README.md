@@ -1,58 +1,135 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg">
+    <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo">
+  </picture>
 </p>
 
-## About Laravel
+<h3 align="center">📝 个人博客系统</h3>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<p align="center">
+  基于 Laravel 13 构建，支持 Markdown 写作、分类标签、暗黑模式、SEO、RSS
+</p>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 功能特性
 
-## Learning Laravel
+| 模块 | 说明 |
+|------|------|
+| 📝 **Markdown 写作** | 全功能 Markdown 编辑器，支持实时预览 |
+| 🏷️ **分类 / 标签** | 多级分类 + 标签系统，文章归属清晰 |
+| 💬 **评论系统** | 基于数据库的评论区 |
+| 🌙 **暗黑模式** | Tailwind CSS 暗色主题，自动跟随系统 |
+| 🔍 **搜索** | 站点全文搜索 |
+| 📡 **RSS / Sitemap** | `/feed.xml` + `/sitemap.xml` |
+| 🖼️ **图片裁剪** | 集成 Cropper.js，上传即裁剪 |
+| ✨ **代码高亮** | Prism.js，支持 10+ 语言 |
+| 🛡️ **CSP 安全头** | 自定义安全策略头部 |
+| 🚀 **SEO** | 友好的元信息、结构化数据 |
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 技术栈
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 后端
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+| 类别 | 技术 | 版本 |
+|------|------|------|
+| 语言 | PHP | ^8.3 |
+| 框架 | Laravel | ^13.8 |
+| 数据库 | PostgreSQL / SQLite | — |
+| 认证 | Laravel Breeze | — |
 
-## Agentic Development
+### 前端
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+| 类别 | 技术 | 版本 |
+|------|------|------|
+| CSS 框架 | Tailwind CSS | v4 |
+| JS 框架 | Alpine.js | 3 |
+| 构建工具 | Vite | 8 |
+| Markdown | marked + DOMPurify | — |
+| 代码高亮 | Prism.js | — |
 
-```bash
-composer require laravel/boost --dev
+### 数据模型
 
-php artisan boost:install
+```
+User ──1:N── Note ──N:M── Category
+                 ├──N:M── Tag
+                 └──1:N── Comment
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## 快速开始
 
-## Contributing
+### Nix（推荐）
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+本项目使用 Nix flakes 管理开发环境：
 
-## Code of Conduct
+```bash
+# 进入全栈开发环境
+nix develop
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# 或仅前端 / 仅后端
+nix develop .#frontend
+nix develop .#backend
+```
 
-## Security Vulnerabilities
+### 手动
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+npm run build
+```
 
-## License
+### 开发
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+composer dev
+# 同时启动: php artisan serve + queue:listen + pail + vite
+```
+
+## 项目结构
+
+```
+app/
+├── Http/Controllers/    # Web + API 控制器
+├── Http/Middleware/      # CSP 安全头等中间件
+├── Models/               # 数据模型
+│   ├── Note.php          # 文章
+│   ├── Category.php      # 分类
+│   ├── Tag.php           # 标签
+│   ├── Comment.php       # 评论
+│   └── SiteSetting.php   # 站点配置
+├── Http/Requests/        # 表单验证
+└── Policies/             # 授权策略
+
+routes/
+├── web.php               # 前台路由
+├── auth.php              # 认证路由
+└── console.php           # 计划任务
+
+resources/
+├── views/                # Blade 模板
+├── css/app.css           # Tailwind 入口
+└── js/                   # Alpine.js + 编辑器
+```
+
+## 构建
+
+```bash
+# 生产构建
+npm run build
+
+# 测试
+composer test
+```
+
+## 部署
+
+参考 [DEPLOYMENT.md](./DEPLOYMENT.md)。
+
+## 许可证
+
+[MIT](./LICENSE)
