@@ -16,8 +16,8 @@
           config.allowUnfree = false;
         };
 
-        # ── PHP 8.3 with Laravel-required extensions ──────────────────
-        php = pkgs.php83.buildEnv {
+        # ── PHP 8.4 with Laravel-required extensions ──────────────────
+        php = pkgs.php84.buildEnv {
           extensions =
             { all, enabled }:
             # Only add extensions NOT already in the default enabled set
@@ -38,8 +38,8 @@
           '';
         };
 
-        # ── Composer 2 (PHP 8.3) ─────────────────────────────────────
-        composer = pkgs.php83Packages.composer;
+        # ── Composer 2 (PHP 8.4) ─────────────────────────────────────
+        composer = pkgs.php84Packages.composer;
 
         # ── Node.js (current LTS) ────────────────────────────────────
         nodejs = pkgs.nodejs_22;
