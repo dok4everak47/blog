@@ -18,6 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // 安全响应头
         $middleware->appendToGroup('web', \App\Http\Middleware\SecurityHeaders::class);
+
+        // 测试环境绕过 CSRF（Laravel 13 测试中不会自动禁用）
+        if (($_ENV['APP_ENV'] ?? $_SERVER['APP_ENV'] ?? app()->environment()) === 'testing') {
+            $middleware->validateCsrfTokens(except: ['*']);
+        }
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
