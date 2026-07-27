@@ -128,7 +128,7 @@ composer test
 
 ## 部署
 
-参考 [DEPLOYMENT.md](./DEPLOYMENT.md)。
+参考 [DEPLOYMENT.md](./docs/DEPLOYMENT.md)。
 
 ## 许可证
 
