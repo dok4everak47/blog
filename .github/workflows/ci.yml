@@ -67,6 +67,14 @@ jobs:
           cp .env.example .env
           php artisan key:generate
 
+      - name: Prepare storage
+        run: |
+          mkdir -p storage/framework/cache/data \
+                   storage/framework/sessions \
+                   storage/framework/views \
+                   storage/logs
+          php artisan storage:link
+
       - name: Run tests (SQLite)
         run: composer test
         env:
