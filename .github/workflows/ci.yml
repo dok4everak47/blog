@@ -78,5 +78,6 @@ jobs:
       - name: Run tests (SQLite)
         run: composer test
         env:
+          APP_ENV: testing
           DB_CONNECTION: sqlite
           DB_DATABASE: ':memory:'

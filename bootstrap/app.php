@@ -19,8 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // 安全响应头
         $middleware->appendToGroup('web', \App\Http\Middleware\SecurityHeaders::class);
 
-        // 测试环境绕过 CSRF（Laravel 13 测试中不会自动禁用）
-        if (($_ENV['APP_ENV'] ?? $_SERVER['APP_ENV'] ?? app()->environment()) === 'testing') {
+        // 通过实际 OS 环境变量判断是否测试环境（phpunit.xml 的 <env> 不一定调用 putenv）
+        if (getenv('APP_ENV') === 'testing') {
             $middleware->validateCsrfTokens(except: ['*']);
         }
     })
