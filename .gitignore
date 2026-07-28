@@ -30,3 +30,4 @@ Thumbs.db
 .direnv/
 /storage/db/
 *.sqlite
+/docs/deploy-update.md
