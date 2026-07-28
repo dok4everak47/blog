@@ -31,7 +31,7 @@
 User ──1:N── Note ──N:M── Category
                  ├──N:M── Tag
                  ├──1:N── Comment
-                 └──1:N── Reaction
+                 └──1:N── Reaction (like)
 ```
 
 ### 关键模型字段
