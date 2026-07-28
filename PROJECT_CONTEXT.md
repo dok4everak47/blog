@@ -31,7 +31,8 @@
 User ──1:N── Note ──N:M── Category
                  ├──N:M── Tag
                  ├──1:N── Comment
-                 └──1:N── Reaction (like)
+                 ├──1:N── Reaction (like)
+                 └──1:N── PageView (浏览日志)
 ```
 
 ### 关键模型字段
@@ -40,6 +41,7 @@ User ──1:N── Note ──N:M── Category
 - **Tag**: name, slug
 - **Comment**: content, note_id, user_id
 - **Reaction**: user_id, note_id, type (default `like`)
+- **PageView**: note_id, ip, user_agent, referer, referer_domain, created_at
 - **SiteSetting**: key, value
 
 ## 路由结构
@@ -55,6 +57,7 @@ User ──1:N── Note ──N:M── Category
 | `/feed.xml` | RSS |
 | `/sitemap.xml` | Sitemap |
 | `/dashboard` | 后台（需登录） |
+| `/dashboard/stats` | 浏览统计（需管理员） |
 | `/notes/create` | 写文章 |
 | `/login`、`/register` | 认证 |
 

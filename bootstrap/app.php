@@ -19,6 +19,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // 安全响应头
         $middleware->appendToGroup('web', \App\Http\Middleware\SecurityHeaders::class);
 
+        // 文章浏览统计
+        $middleware->appendToGroup('web', \App\Http\Middleware\RecordPageView::class);
+
         // 通过实际 OS 环境变量判断是否测试环境（phpunit.xml 的 <env> 不一定调用 putenv）
         if (getenv('APP_ENV') === 'testing') {
             $middleware->validateCsrfTokens(except: ['*']);

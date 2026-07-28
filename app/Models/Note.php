@@ -111,6 +111,11 @@ class Note extends Model
         return $this->hasMany(Comment::class)->whereNull('parent_id')->oldest();
     }
 
+    public function pageViews()
+    {
+        return $this->hasMany(PageView::class);
+    }
+
     public function reactions()
     {
         return $this->hasMany(Reaction::class);

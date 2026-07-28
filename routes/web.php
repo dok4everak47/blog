@@ -8,6 +8,7 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Dashboard\StatsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReactionController;
 use Illuminate\Support\Facades\Route;
@@ -55,6 +56,9 @@ Route::get('/notes/{note}', [NoteController::class, 'show'])
 Route::middleware('auth')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/stats', [StatsController::class, 'index'])
+        ->middleware('admin')
+        ->name('dashboard.stats');
 
     // 站点全局设置（仅管理员）
     Route::middleware('admin')->group(function () {
