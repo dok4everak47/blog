@@ -118,6 +118,72 @@ $readTime = $note->readingMinutes();
           ]) !!}
         </div>
       </div>
+
+      {{-- 点赞 + 分享 --}}
+      <div class="mt-8 flex items-center gap-4">
+        @auth
+          <div x-data="{
+              liked: {{ \App\Models\Reaction::isLikedBy($note->id, auth()->id()) ? 'true' : 'false' }},
+              count: {{ \App\Models\Reaction::countByNote($note->id) }},
+              loading: false,
+              toggleLike() {
+                  if (this.loading) return;
+                  this.loading = true;
+                  fetch('{{ route('notes.reactions.toggle', $note) }}', {
+                      method: 'POST',
+                      headers: {
+                          'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                          'Accept': 'application/json'
+                      }
+                  })
+                  .then(r => r.json())
+                  .then(d => {
+                      this.liked = d.liked;
+                      this.count = d.count;
+                  })
+                  .catch(() => {})
+                  .finally(() => this.loading = false);
+              }
+          }">
+            <button type="button"
+                    x-on:click.prevent.stop="toggleLike()"
+                    :disabled="loading"
+                    :class="liked ? 'text-red-500 bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-900' : 'text-text-secondary hover:text-primary bg-surface-2 border-border'"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition disabled:opacity-50">
+              <span x-text="liked ? '❤️' : '🤍'"></span>
+              <span x-text="count"></span>
+            </button>
+          </div>
+        @else
+          <a href="{{ route('login') }}"
+             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-surface-2 text-sm text-text-secondary hover:text-primary transition">
+            <span>🤍</span>
+            <span>{{ \App\Models\Reaction::countByNote($note->id) }}</span>
+          </a>
+        @endauth
+
+        <div x-data="{ show: false }" class="relative">
+          <button @click="show = !show"
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-surface-2 text-sm text-text-secondary hover:text-primary transition">
+            <span>📤</span>
+            <span>分享</span>
+          </button>
+          <div x-show="show"
+               x-cloak
+               @click.outside="show = false"
+               class="absolute left-0 mt-2 w-40 rounded-xl border border-border bg-surface shadow-lg p-1 z-10">
+            <a :href="'https://twitter.com/intent/tweet?text=' + encodeURIComponent('{{ addslashes($note->title) }}') + '&url=' + encodeURIComponent(window.location.href)"
+               target="_blank"
+               class="block px-3 py-2 text-sm text-text-secondary hover:text-primary hover:bg-surface-2 rounded-lg transition">
+              Twitter
+            </a>
+            <button @click="navigator.clipboard.writeText(window.location.href); show = false;"
+                    class="w-full text-left px-3 py-2 text-sm text-text-secondary hover:text-primary hover:bg-surface-2 rounded-lg transition">
+              复制链接
+            </button>
+          </div>
+        </div>
+      </div>
     </article>
 
       </div>{{-- 左侧文章主体结束 --}}

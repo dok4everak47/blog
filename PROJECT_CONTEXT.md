@@ -30,7 +30,8 @@
 ```
 User ──1:N── Note ──N:M── Category
                  ├──N:M── Tag
-                 └──1:N── Comment
+                 ├──1:N── Comment
+                 └──1:N── Reaction
 ```
 
 ### 关键模型字段
@@ -38,6 +39,7 @@ User ──1:N── Note ──N:M── Category
 - **Category**: name, slug
 - **Tag**: name, slug
 - **Comment**: content, note_id, user_id
+- **Reaction**: user_id, note_id, type (default `like`)
 - **SiteSetting**: key, value
 
 ## 路由结构

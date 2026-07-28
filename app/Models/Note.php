@@ -111,6 +111,11 @@ class Note extends Model
         return $this->hasMany(Comment::class)->whereNull('parent_id')->oldest();
     }
 
+    public function reactions()
+    {
+        return $this->hasMany(Reaction::class);
+    }
+
     /**
      * 封面图公开访问地址（存储于 storage/app/public/covers）。
      * 返回根相对路径（/storage/...），兼容开发端口与正式部署。
