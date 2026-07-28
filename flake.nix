@@ -94,6 +94,13 @@
                 fi
                 # 确保 blog 数据库存在
                 psql -tc "SELECT 1 FROM pg_database WHERE datname = 'blog'" 2>/dev/null | grep -q 1 || createdb blog 2>/dev/null || true
+                # 确保 postgres 角色存在（.env 使用 postgres 用户连接）
+                psql -tc "SELECT 1 FROM pg_roles WHERE rolname = 'postgres'" 2>/dev/null | grep -q 1 || psql -c "CREATE ROLE postgres WITH LOGIN SUPERUSER;" 2>/dev/null || true
+              fi
+
+              # ── 自动运行数据库迁移 ──────────────────────────────────
+              if [ -f artisan ] && [ -f .env ]; then
+                php artisan migrate --force 2>/dev/null || true
               fi
 
               if [ ! -f .env ]; then
