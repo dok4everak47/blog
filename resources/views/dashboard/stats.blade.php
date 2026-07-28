@@ -34,8 +34,9 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm text-text-secondary">平均每日</p>
+                            @php $daysSpan = $dailyViews->keys()->count() ?: 1; @endphp
                             <p class="text-3xl font-bold text-text mt-1">
-                                {{ $totalViews > 0 ? number_format($totalViews / max(1, $totalViews > 0 ? (int) ceil(PageView::whereNotNull('created_at')->count() > 0 ? PageView::selectRaw('DATEDIFF(MAX(created_at), MIN(created_at)) + 1 as days')->value('days') ?: 1 : 1) : 1)) : 0 }}
+                                {{ number_format($totalViews > 0 ? (int) round($totalViews / max(1, $daysSpan)) : 0) }}
                             </p>
                         </div>
                         <span class="text-3xl">📊</span>
