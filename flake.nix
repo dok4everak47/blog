@@ -79,6 +79,23 @@
             shellHook = ''
               echo "[nix] Proxy: http://127.0.0.1:7890 (ClashX)"
 
+              # ── PostgreSQL 本地服务 ──────────────────────────────────
+              PGDATA="$PWD/storage/db/pgdata"
+              PGLOG="$PWD/storage/logs/pg.log"
+              if command -v pg_ctl &>/dev/null; then
+                if [ ! -d "$PGDATA" ]; then
+                  echo "[nix] Initializing PostgreSQL..."
+                  initdb -D "$PGDATA" --encoding=UTF8 --locale=C --auth=trust > /dev/null 2>&1
+                fi
+                if ! pg_isready -q 2>/dev/null; then
+                  echo "[nix] Starting PostgreSQL..."
+                  pg_ctl -D "$PGDATA" -l "$PGLOG" start > /dev/null 2>&1
+                  sleep 1
+                fi
+                # 确保 blog 数据库存在
+                psql -tc "SELECT 1 FROM pg_database WHERE datname = 'blog'" 2>/dev/null | grep -q 1 || createdb blog 2>/dev/null || true
+              fi
+
               if [ ! -f .env ]; then
                 echo ""
                 echo "  ╔══════════════════════════════════════════════════╗"
