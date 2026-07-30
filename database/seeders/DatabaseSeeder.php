@@ -16,12 +16,16 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. 只创建一个管理员用户
-        $admin = User::factory()->create([
-            'name' => 'Admin',
-            'email' => 'admin@example.com',
-        ]);
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            ['name' => 'Admin', 'password' => bcrypt('password')]
+        );
         $admin->is_admin = true;
         $admin->save();
+
+        if (\App\Models\Note::count() > 0) {
+            return;
+        }
 
         // 2. 创建分类
         $categories = \App\Models\Category::factory(6)->create();
