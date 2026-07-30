@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-07-30T07:37:19.877Z",
+  "task": {
+    "description": "修复文章保存异常",
+    "project": "83912f76-759b-4bdf-b46d-560500c1f09d",
+    "priority": ""
+  },
+  "agent": {
+    "name": "build",
+    "role": ""
+  },
+  "workflow": {
+    "name": "bug-fix",
+    "step": 4,
+    "totalSteps": 3,
+    "status": "completed",
+    "currentAction": ""
+  },
+  "session": {
+    "startedAt": "2026-07-30T07:27:02.752Z",
+    "duration": "10 min",
+    "toolCalls": 0,
+    "filesChanged": 4,
+    "commandsRun": 2
+  },
+  "background": {
+    "pid": 59270,
+    "progress": "Session ended. 4 files, 2 commands.",
+    "actions": 2,
+    "status": "completed",
+    "heartbeat": "2026-07-30T07:37:19.862Z"
+  }
+}

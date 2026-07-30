@@ -6,31 +6,39 @@ use App\Models\Note;
 use App\Models\Category;
 use App\Models\Tag;
 use App\Models\SiteSetting;
+use App\Models\PageView;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    /**
-     * 后台首页：统计 + 最近文章（仅当前用户，含草稿）
-     */
+    private const CACHE_TTL_HOUR = 3600;
+    private const CACHE_TTL_TEN_MINUTES = 600;
+
+    private const CACHE_KEY_CATEGORIES_COUNT = 'dashboard.categories_count';
+    private const CACHE_KEY_TAGS_COUNT = 'dashboard.tags_count';
+    private const CACHE_KEY_TOTAL_VIEWS = 'dashboard.total_views';
+    private const CACHE_KEY_ABOUT_CONTENT = 'dashboard.about_content';
+
     public function index(): View
     {
-        $notes = Note::forUser()
-            ->latest()
-            ->take(5)
-            ->get();
+        $notesQuery = Note::forUser();
 
-        $notesCount = Note::forUser()->count();
-        $categoriesCount = Category::count();
-        $tagsCount = Tag::count();
+        $notesCount = $notesQuery->count();
+        $notes = $notesQuery->latest()->take(5)->get();
+
+        $categoriesCount = Cache::remember(self::CACHE_KEY_CATEGORIES_COUNT, self::CACHE_TTL_HOUR, fn () => Category::count());
+        $tagsCount = Cache::remember(self::CACHE_KEY_TAGS_COUNT, self::CACHE_TTL_HOUR, fn () => Tag::count());
+        $totalViews = Cache::remember(self::CACHE_KEY_TOTAL_VIEWS, self::CACHE_TTL_TEN_MINUTES, fn () => PageView::count());
+
         $heroImage = SiteSetting::get('hero_image');
         $aboutMarkdown = SiteSetting::get('about_markdown', '');
 
-        return view('dashboard', compact('notes', 'notesCount', 'categoriesCount', 'tagsCount', 'heroImage', 'aboutMarkdown'));
+        return view('dashboard', compact('notes', 'notesCount', 'categoriesCount', 'tagsCount', 'totalViews', 'heroImage', 'aboutMarkdown'));
     }
 
     /**
@@ -38,7 +46,7 @@ class DashboardController extends Controller
      */
     public function getAboutContent(): JsonResponse
     {
-        $markdown = SiteSetting::get('about_markdown', '');
+        $markdown = Cache::remember(self::CACHE_KEY_ABOUT_CONTENT, self::CACHE_TTL_HOUR, fn () => SiteSetting::get('about_markdown', ''));
         return response()->json(['markdown' => $markdown]);
     }
 
@@ -56,6 +64,7 @@ class DashboardController extends Controller
         }
 
         SiteSetting::set('about_markdown', $request->input('markdown', ''));
+        Cache::forget(self::CACHE_KEY_ABOUT_CONTENT);
 
         return response()->json(['message' => 'About 内容已更新']);
     }
@@ -70,17 +79,12 @@ class DashboardController extends Controller
      */
     public function updateHeroImage(Request $request): JsonResponse
     {
-        // 移除背景图
         if ($request->boolean('remove')) {
-            $oldPath = SiteSetting::get('hero_image');
+            $this->deleteOldHeroImage();
             SiteSetting::set('hero_image', null);
-            if ($oldPath && str_starts_with($oldPath, '/storage/uploads/')) {
-                Storage::disk('public')->delete(str_replace('/storage/', '', $oldPath));
-            }
             return response()->json(['url' => null, 'message' => 'Hero 背景图已移除']);
         }
 
-        // 手动校验（web 路由必须显式返回 JSON 422，否则 validate() 返回 302）
         $validator = Validator::make($request->all(), [
             'image' => 'required|image|mimes:jpeg,png,jpg,webp,gif|max:20480',
         ], [
@@ -94,24 +98,27 @@ class DashboardController extends Controller
             return response()->json(['errors' => $validator->errors()->toArray()], 422);
         }
 
-        // 存储文件（try-catch 兜底磁盘/权限异常）
         try {
             $path = $request->file('image')->store('uploads', 'public');
         } catch (\Exception $e) {
-            report($e); // 记录到日志但不暴露细节
+            report($e);
             return response()->json(['errors' => ['image' => ['上传失败，请稍后重试']]], 500);
         }
 
         $url = '/storage/' . ltrim($path, '/');
 
-        // 删除旧图
-        $oldPath = SiteSetting::get('hero_image');
-        if ($oldPath && str_starts_with($oldPath, '/storage/uploads/')) {
-            Storage::disk('public')->delete(str_replace('/storage/', '', $oldPath));
-        }
-
+        $oldHeroImage = SiteSetting::get('hero_image');
+        $this->deleteOldHeroImage($oldHeroImage);
         SiteSetting::set('hero_image', $url);
 
         return response()->json(['url' => $url, 'message' => 'Hero 背景图更新成功']);
+    }
+
+    private function deleteOldHeroImage(?string $oldPath = null): void
+    {
+        $oldPath ??= SiteSetting::get('hero_image');
+        if ($oldPath && str_starts_with($oldPath, '/storage/uploads/')) {
+            Storage::disk('public')->delete(str_replace('/storage/', '', $oldPath));
+        }
     }
 }

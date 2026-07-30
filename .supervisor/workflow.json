@@ -1,0 +1,22 @@
+{
+  "workflow": "bug-fix",
+  "currentStep": 3,
+  "status": "completed",
+  "startedAt": "2026-07-30T07:27:02.752Z",
+  "completed": [
+    "0",
+    "1",
+    "2"
+  ],
+  "pending": [
+    "coder",
+    "coder",
+    "tester"
+  ],
+  "agents": [
+    "coder",
+    "coder",
+    "tester"
+  ],
+  "artifacts": {}
+}

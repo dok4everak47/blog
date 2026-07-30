@@ -2,23 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Note;
-use App\Models\Tag;
-use App\Models\Category;
 use App\Enums\NoteStatus;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\AutosaveNoteRequest;
 use App\Http\Requests\StoreNoteRequest;
 use App\Http\Requests\UpdateNoteRequest;
+use App\Models\Category;
+use App\Models\Note;
+use App\Models\Tag;
+use App\Services\CoverImageService;
+use App\Services\ImageProcessor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class NoteController extends Controller
 {
+    public function __construct(
+        private readonly CoverImageService $covers,
+        private readonly ImageProcessor $images,
+    ) {}
+
     /**
      * 文章列表（公开访问，分页）
      */
@@ -51,11 +58,8 @@ class NoteController extends Controller
         $this->authorize('create', Note::class);
 
         $cover = $request->hasFile('cover_image')
-            ? $request->file('cover_image')->store('covers', 'public')
-            : null;
-
-        // 生成缩略图
-        $thumbnail = $cover ? Note::generateThumbnail($cover) : null;
+            ? $this->covers->upload($request->file('cover_image'))
+            : ['cover' => null, 'thumbnail' => null];
 
         $status = $request->input('status', 'published');
 
@@ -67,8 +71,8 @@ class NoteController extends Controller
             'slug' => $this->makeSlug($request->slug, $request->title, null),
             'status' => $status,
             'published_at' => $status === 'published' ? now() : null,
-            'cover_image' => $cover,
-            'thumbnail_url' => $thumbnail,
+            'cover_image' => $cover['cover'],
+            'thumbnail_url' => $cover['thumbnail'],
         ]);
 
         if ($request->has('tags')) {
@@ -91,11 +95,11 @@ class NoteController extends Controller
         // Policy 双重校验：已发布→放行，草稿→仅作者（含 403/404）
         $this->authorize('view', $note);
 
-        $note->load('tags', 'category', 'user', 'comments.user', 'comments.replies.user');
+        $note->loadMissing(['tags', 'category', 'user', 'comments.user', 'comments.replies.user']);
 
         // 阅读统计：用 session 防刷（同一会话内不重复计数）
         $viewKey = "viewed_note_{$note->id}";
-        if (!session($viewKey)) {
+        if (! session($viewKey)) {
             $note->increment('views');
             session([$viewKey => true]);
         }
@@ -104,15 +108,10 @@ class NoteController extends Controller
         $previous = Note::published()->where('id', '<', $note->id)->latest('id')->first();
         $next = Note::published()->where('id', '>', $note->id)->oldest('id')->first();
 
-        // 相关文章（同分类或共享标签，排除自身，取 3 篇）
-        $related = Note::published()->where('id', '!=', $note->id)
-            ->when($note->category_id, fn ($q) => $q->where('category_id', $note->category_id))
-            ->with('category')
-            ->latest()
-            ->take(3)
-            ->get();
+        // 相关文章（基于共同标签匹配，排除自身，取 5 篇）
+        $relatedNotes = $note->related();
 
-        return view('notes.show', compact('note', 'previous', 'next', 'related'));
+        return view('notes.show', compact('note', 'previous', 'next', 'relatedNotes'));
     }
 
     /**
@@ -147,29 +146,20 @@ class NoteController extends Controller
         ];
 
         // 草稿转发布时设置 published_at；发布转草稿时保留原 published_at
-        if ($status === 'published' && !$note->published_at) {
+        if ($status === 'published' && ! $note->published_at) {
             $data['published_at'] = now();
         }
 
-        // 封面图：上传新图 / 移除旧图
-        if ($request->hasFile('cover_image')) {
-            if ($note->cover_image) {
-                Storage::disk('public')->delete($note->cover_image);
-            }
-            if ($note->thumbnail_url) {
-                Storage::disk('public')->delete($note->thumbnail_url);
-            }
-            $data['cover_image'] = $request->file('cover_image')->store('covers', 'public');
-            $data['thumbnail_url'] = Note::generateThumbnail($data['cover_image']);
-        } elseif ($request->boolean('remove_cover')) {
-            if ($note->cover_image) {
-                Storage::disk('public')->delete($note->cover_image);
-            }
-            if ($note->thumbnail_url) {
-                Storage::disk('public')->delete($note->thumbnail_url);
-            }
-            $data['cover_image'] = null;
-            $data['thumbnail_url'] = null;
+        // 封面图：上传新图 / 移除旧图（无操作时返回 null，跳过更新）
+        $cover = $this->covers->apply(
+            $note->cover_image,
+            $note->getRawOriginal('thumbnail_url'),
+            $request->hasFile('cover_image') ? $request->file('cover_image') : null,
+            $request->boolean('remove_cover'),
+        );
+        if ($cover !== null) {
+            $data['cover_image'] = $cover['cover'];
+            $data['thumbnail_url'] = $cover['thumbnail'];
         }
 
         $note->update($data);
@@ -187,19 +177,9 @@ class NoteController extends Controller
      * 自动保存 / 存草稿（后台静默保存，返回 JSON）
      * 用于编辑器实时保存，避免意外丢失内容。
      */
-    public function autosave(Request $request)
+    public function autosave(AutosaveNoteRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'id' => 'nullable|integer|exists:notes,id',
-            'title' => 'nullable|string|max:255',
-            'content' => 'nullable|string',
-            'category_id' => 'nullable|exists:categories,id',
-            'tags' => 'nullable|array',
-            'tags.*' => 'exists:tags,id',
-            'slug' => 'nullable|string|max:255',
-            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:10240',
-            'remove_cover' => 'nullable|boolean',
-        ]);
+        $data = $request->validated();
 
         $attrs = [
             'title' => $data['title'] ?? '',
@@ -209,29 +189,20 @@ class NoteController extends Controller
             'slug' => $this->makeSlug($data['slug'] ?? null, $data['title'] ?? '', $data['id'] ?? null),
         ];
 
-        if (!empty($data['id'])) {
+        if (! empty($data['id'])) {
             // 更新已有文章（保留原状态，autosave 不会把已发布文章降级为草稿）
             $note = Note::find($data['id']);
             $this->authorize('update', $note);
 
-            if ($request->hasFile('cover_image')) {
-                if ($note->cover_image) {
-                    Storage::disk('public')->delete($note->cover_image);
-                }
-                if ($note->thumbnail_url) {
-                    Storage::disk('public')->delete($note->thumbnail_url);
-                }
-                $attrs['cover_image'] = $request->file('cover_image')->store('covers', 'public');
-                $attrs['thumbnail_url'] = Note::generateThumbnail($attrs['cover_image']);
-            } elseif ($request->boolean('remove_cover')) {
-                if ($note->cover_image) {
-                    Storage::disk('public')->delete($note->cover_image);
-                }
-                if ($note->thumbnail_url) {
-                    Storage::disk('public')->delete($note->thumbnail_url);
-                }
-                $attrs['cover_image'] = null;
-                $attrs['thumbnail_url'] = null;
+            $cover = $this->covers->apply(
+                $note->cover_image,
+                $note->getRawOriginal('thumbnail_url'),
+                $request->hasFile('cover_image') ? $request->file('cover_image') : null,
+                $request->boolean('remove_cover'),
+            );
+            if ($cover !== null) {
+                $attrs['cover_image'] = $cover['cover'];
+                $attrs['thumbnail_url'] = $cover['thumbnail'];
             }
 
             $note->update($attrs);
@@ -241,8 +212,9 @@ class NoteController extends Controller
             $this->authorize('create', Note::class);
 
             if ($request->hasFile('cover_image')) {
-                $attrs['cover_image'] = $request->file('cover_image')->store('covers', 'public');
-                $attrs['thumbnail_url'] = Note::generateThumbnail($attrs['cover_image']);
+                $cover = $this->covers->upload($request->file('cover_image'));
+                $attrs['cover_image'] = $cover['cover'];
+                $attrs['thumbnail_url'] = $cover['thumbnail'];
             }
             $attrs['status'] = NoteStatus::Draft->value;
             $note = auth()->user()->notes()->create($attrs);
@@ -263,18 +235,14 @@ class NoteController extends Controller
      */
     public function uploadImage(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'image' => 'required|image|mimes:jpeg,png,jpg,webp,gif|max:10240',
-        ]);
+        $result = $this->images->upload($request->all(), 'uploads', 10240);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+        if (isset($result['error'])) {
+            return response()->json(['errors' => $result['error']], 422);
         }
 
-        $path = $request->file('image')->store('uploads', 'public');
-
         return response()->json([
-            'url' => '/storage/'.ltrim($path, '/'),
+            'url' => '/storage/'.ltrim($result['path'], '/'),
         ]);
     }
 
@@ -295,37 +263,23 @@ class NoteController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // 无操作：既没有上传新图也没有移除
-        if (!$request->hasFile('cover_image') && !$request->boolean('remove_cover')) {
+        // 无操作：既没有上传新图也没有勾选移除
+        $cover = $this->covers->apply(
+            $note->cover_image,
+            $note->getRawOriginal('thumbnail_url'),
+            $request->hasFile('cover_image') ? $request->file('cover_image') : null,
+            $request->boolean('remove_cover'),
+        );
+        if ($cover === null) {
             return response()->json([
                 'cover_url' => $note->cover_image_url,
                 'message' => '未变更',
             ]);
         }
 
-        if ($request->hasFile('cover_image')) {
-            if ($note->cover_image) {
-                Storage::disk('public')->delete($note->cover_image);
-            }
-            if ($note->thumbnail_url) {
-                Storage::disk('public')->delete($note->thumbnail_url);
-            }
-            $cover = $request->file('cover_image')->store('covers', 'public');
-            $thumbnail = Note::generateThumbnail($cover);
-        } else { // remove_cover = true
-            if ($note->cover_image) {
-                Storage::disk('public')->delete($note->cover_image);
-            }
-            if ($note->thumbnail_url) {
-                Storage::disk('public')->delete($note->thumbnail_url);
-            }
-            $cover = null;
-            $thumbnail = null;
-        }
-
         $note->update([
-            'cover_image' => $cover,
-            'thumbnail_url' => $thumbnail,
+            'cover_image' => $cover['cover'],
+            'thumbnail_url' => $cover['thumbnail'],
         ]);
 
         return response()->json([
@@ -341,7 +295,7 @@ class NoteController extends Controller
     {
         $base = $slug ?: Str::slug($title);
 
-        if (!$base) {
+        if (! $base) {
             return null;
         }
 
@@ -365,12 +319,10 @@ class NoteController extends Controller
     {
         $this->authorize('delete', $note);
 
-        if ($note->cover_image) {
-            Storage::disk('public')->delete($note->cover_image);
-        }
-        if ($note->thumbnail_url) {
-            Storage::disk('public')->delete($note->thumbnail_url);
-        }
+        $this->covers->remove(
+            $note->cover_image,
+            $note->getRawOriginal('thumbnail_url'),
+        );
 
         $note->delete();
 

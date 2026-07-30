@@ -22,7 +22,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // 文章浏览统计
         $middleware->appendToGroup('web', \App\Http\Middleware\RecordPageView::class);
 
-        // 通过实际 OS 环境变量判断是否测试环境（phpunit.xml 的 <env> 不一定调用 putenv）
+        // 测试环境禁用 CSRF 校验：Laravel 13 在测试中不会自动跳过 CSRF（
+        // phpunit.xml 的 <env> 不一定调用 putenv()，且 Laravel app 在 PHPUnit
+        // 注入前已 boot）。必须由调用方 OS 级传 APP_ENV=testing（如
+        // `APP_ENV=testing php artisan test`），此处 getenv() 才能拿到 'testing'。
         if (getenv('APP_ENV') === 'testing') {
             $middleware->validateCsrfTokens(except: ['*']);
         }

@@ -331,23 +331,7 @@ $readTime = $note->readingMinutes();
     @endif
 
     {{-- 相关文章 --}}
-    @if ($related->isNotEmpty())
-      <section class="mt-12 pt-10 border-t border-border">
-        <p class="text-xs font-medium tracking-[0.2em] text-primary uppercase mb-5">Related</p>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          @foreach ($related as $rel)
-            <a href="{{ route('notes.show', $rel) }}"
-               class="group rounded-xl border border-border bg-surface-2 p-5 hover:border-border-strong hover:shadow-sm transition-all duration-300">
-              @if ($rel->category)
-                <p class="text-xs text-primary mb-2">{{ $rel->category->name }}</p>
-              @endif
-              <p class="text-sm font-bold text-text group-hover:text-primary transition leading-snug line-clamp-2 mb-2">{{ $rel->title }}</p>
-              <p class="text-xs text-text-muted">{{ $rel->created_at->format('Y-m-d') }}</p>
-            </a>
-          @endforeach
-        </div>
-      </section>
-    @endif
+    @include('notes.partials.related-notes')
 
     <div class="mt-10 flex flex-wrap items-center gap-4 text-sm font-medium pt-8 border-t border-border">
       <a href="{{ route('home') }}" class="text-text-secondary hover:text-primary transition">← 回首页</a>

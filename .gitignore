@@ -31,3 +31,4 @@ Thumbs.db
 /storage/db/
 *.sqlite
 /docs/deploy-update.md
+blog
