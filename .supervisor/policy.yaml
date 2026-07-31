@@ -1,4 +1,16 @@
 rules:
+  - name: allow-git-push
+    action: allow
+    pattern:
+      - ^git push$
+  - name: allow-git-push-origin
+    action: allow
+    pattern:
+      - ^git push origin
+  - name: allow-git-push-upstream
+    action: allow
+    pattern:
+      - ^git push --set-upstream
   - name: protect-env
     action: block
     pattern:

@@ -1,12 +1,10 @@
 {
   "workflow": "bug-fix",
-  "currentStep": 3,
-  "status": "completed",
-  "startedAt": "2026-07-30T07:27:02.752Z",
+  "currentStep": 1,
+  "status": "running",
+  "startedAt": "2026-07-31T13:00:44.768Z",
   "completed": [
-    "0",
-    "1",
-    "2"
+    "0"
   ],
   "pending": [
     "coder",

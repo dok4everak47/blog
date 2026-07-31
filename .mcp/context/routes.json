@@ -1,0 +1,13 @@
+{
+  "data": {
+    "count": 0,
+    "named": [],
+    "groups": []
+  },
+  "builtAt": 1785490500600,
+  "dependencies": {
+    "/Users/dok4ever/Project/blog/routes/auth.php": 1783914549359,
+    "/Users/dok4ever/Project/blog/routes/console.php": 1779750712000,
+    "/Users/dok4ever/Project/blog/routes/web.php": 1785483343894
+  }
+}

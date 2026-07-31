@@ -1,0 +1,21 @@
+{
+  "data": [
+    "App\\Models\\Category",
+    "App\\Models\\Note",
+    "App\\Models\\PageView",
+    "App\\Models\\Reaction",
+    "App\\Models\\SiteSetting",
+    "App\\Models\\TagRelation",
+    "App\\Models\\User"
+  ],
+  "builtAt": 1785490500599,
+  "dependencies": {
+    "/Users/dok4ever/Project/blog/app/Models/Category.php": 1783867026455,
+    "/Users/dok4ever/Project/blog/app/Models/Note.php": 1785397010979,
+    "/Users/dok4ever/Project/blog/app/Models/PageView.php": 1785225524324,
+    "/Users/dok4ever/Project/blog/app/Models/Reaction.php": 1785221978724,
+    "/Users/dok4ever/Project/blog/app/Models/SiteSetting.php": 1783848889685,
+    "/Users/dok4ever/Project/blog/app/Models/TagRelation.php": 1785395581116,
+    "/Users/dok4ever/Project/blog/app/Models/User.php": 1783913744821
+  }
+}
