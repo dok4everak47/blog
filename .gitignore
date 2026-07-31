@@ -32,3 +32,4 @@ Thumbs.db
 *.sqlite
 /docs/deploy-update.md
 blog
+.mcp/
