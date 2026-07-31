@@ -130,4 +130,3 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 Route::resource('tags', TagController::class);
-Route::resource('comments', CommentController::class);
