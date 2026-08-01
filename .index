@@ -24,3 +24,4 @@ storage
 tests
 vendor
 vite.config.js
+迁移约定__迁移文件建好后不要改名.md
