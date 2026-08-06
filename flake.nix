@@ -61,6 +61,7 @@
             buildInputs = with pkgs; [
               php composer nodejs postgresql_16
               git curl wget jq ripgrep concurrently
+              phpactor                          # PHP LSP (Emacs eglot 补全/跳转/重构)
             ];
 
             APP_ENV = "local";
@@ -89,7 +90,14 @@
                 fi
                 if ! pg_isready -q 2>/dev/null; then
                   echo "[nix] Starting PostgreSQL..."
-                  pg_ctl -D "$PGDATA" -l "$PGLOG" start > /dev/null 2>&1
+                  # 在子 shell 中启动并关闭全部继承 fd(3+)：否则 postmaster 会
+                  # 持有 direnv 输出管道的写端，导致 `direnv export` 永远等不到
+                  # EOF 而挂起（每天第一次打开时必现）。
+                  (
+                    exec 0</dev/null 1>/dev/null 2>/dev/null
+                    for fd in $(seq 3 255); do eval "exec $fd>&-" 2>/dev/null; done
+                    exec pg_ctl -D "$PGDATA" -l "$PGLOG" start
+                  )
                   sleep 1
                 fi
                 # 确保 blog 数据库存在
@@ -143,6 +151,7 @@
           backend = pkgs.mkShell {
             buildInputs = with pkgs; [
               php composer postgresql_16
+              phpactor                          # PHP LSP
             ];
 
             shellHook = ''
