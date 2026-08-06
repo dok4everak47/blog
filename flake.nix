@@ -62,6 +62,8 @@
               php composer nodejs postgresql_16
               git curl wget jq ripgrep concurrently
               phpactor                          # PHP LSP (Emacs eglot 补全/跳转/重构)
+              pyright                           # Python LSP
+              typescript-language-server         # JS/TS LSP
             ];
 
             APP_ENV = "local";
