@@ -71,7 +71,7 @@ $readTime = $note->readingMinutes();
     <article>
       <p class="text-xs font-medium tracking-[0.2em] text-primary uppercase mb-4">文章</p>
 
-      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-5 leading-tight">{{ $note->title }}</h1>
+      <h1 class="article-title text-3xl sm:text-4xl font-bold tracking-tight mb-5 leading-tight">{{ $note->title }}</h1>
 
       @if ($note->cover_image_url)
         <div class="mb-8 rounded-2xl overflow-hidden border border-border">

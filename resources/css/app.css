@@ -740,9 +740,12 @@ body {
     font-size: 1rem;
 }
 
-/* 文章正文使用 Luo 落文楷意字体（仅 CJK / 全角符号命中，英文数字回退系统无衬线） */
+/* 文章标题 + 正文使用 Luo 落文楷意字体（仅 CJK / 全角符号命中，英文数字回退系统无衬线） */
+.article-title,
 .article-content {
     font-family: 'Luo', var(--font-sans);
+}
+.article-content {
     line-height: 1.85;
     letter-spacing: 0.01em;
 }
