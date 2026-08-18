@@ -33,3 +33,10 @@ Thumbs.db
 /docs/deploy-update.md
 blog
 .mcp/
+<<<<<<< HEAD
+=======
+/.index
+
+# DSH supervisor runtime state
+.supervisor/
+>>>>>>> cd9a9e8 (feat: add stats dashboard, autosave, reactions, search indexes, Luo font)
