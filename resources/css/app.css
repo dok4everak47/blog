@@ -2,6 +2,17 @@
 @import './dark-mode.css';
 @import './prism.css';
 
+/* Luo 落文 — 面向纸面阅读的开源楷意字体（https://github.com/tw93/Luo，SIL OFL 1.1）
+   仅用于文章正文，UI 保持系统无衬线。 */
+@font-face {
+    font-family: 'Luo';
+    src: url('/fonts/Luo-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+4E00-9FFF, U+3400-4DBF, U+3000-303F, U+FF00-FFEF;
+}
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
@@ -727,6 +738,13 @@ body {
 .md-preview,
 .article-content {
     font-size: 1rem;
+}
+
+/* 文章正文使用 Luo 落文楷意字体（仅 CJK / 全角符号命中，英文数字回退系统无衬线） */
+.article-content {
+    font-family: 'Luo', var(--font-sans);
+    line-height: 1.85;
+    letter-spacing: 0.01em;
 }
 .md-preview h1,
 .article-content h1 {
