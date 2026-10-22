@@ -2,7 +2,8 @@
   description = "Laravel Blog — Nix devShell (macOS Apple Silicon)";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    # Pinned to the first nixpkgs revision carrying the PHP 8.4.27 security fix.
+    nixpkgs.url = "github:nixos/nixpkgs/dce1caf58d1a943af38b376e824a0d036ec3eea7";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -80,6 +81,7 @@
             NO_PROXY    = "localhost,127.0.0.1,::1";
 
             shellHook = ''
+              export PATH="${php}/bin:${composer}/bin:${nodejs}/bin:${pkgs.postgresql_16}/bin:$PATH"
               echo "[nix] Proxy: http://127.0.0.1:7890 (ClashX)"
 
               # ── PostgreSQL 本地服务 ──────────────────────────────────
@@ -106,11 +108,6 @@
                 psql -tc "SELECT 1 FROM pg_database WHERE datname = 'blog'" 2>/dev/null | grep -q 1 || createdb blog 2>/dev/null || true
                 # 确保 postgres 角色存在（.env 使用 postgres 用户连接）
                 psql -tc "SELECT 1 FROM pg_roles WHERE rolname = 'postgres'" 2>/dev/null | grep -q 1 || psql -c "CREATE ROLE postgres WITH LOGIN SUPERUSER;" 2>/dev/null || true
-              fi
-
-              # ── 自动运行数据库迁移 ──────────────────────────────────
-              if [ -f artisan ] && [ -f .env ]; then
-                php artisan migrate --force 2>/dev/null || true
               fi
 
               if [ ! -f .env ]; then
@@ -141,6 +138,7 @@
             ];
 
             shellHook = ''
+              export PATH="${nodejs}/bin:$PATH"
               echo "  🎨  Frontend devShell"
               echo "  ─────────────────────"
               echo "  Node   $(node --version)"
@@ -157,6 +155,7 @@
             ];
 
             shellHook = ''
+              export PATH="${php}/bin:${composer}/bin:${pkgs.postgresql_16}/bin:$PATH"
               echo "  ⚙️  Backend devShell"
               echo "  ────────────────────"
               echo "  PHP    $(php -r 'echo PHP_VERSION;')"

@@ -20,17 +20,30 @@ class SearchController extends Controller
 
         $notes = Note::published()
             ->when($q !== '', function ($query) use ($q) {
-                $query->where(function ($sub) use ($q) {
-                    foreach (preg_split('/\s+/', $q) as $word) {
-                        $sub->where(function ($wq) use ($word) {
-                            $wq->whereRaw('similarity(lower(title), ?) > 0.2', [mb_strtolower($word)])
-                               ->orWhereRaw('similarity(lower(content), ?) > 0.2', [mb_strtolower($word)]);
+                $isPgSql = $query->getConnection()->getDriverName() === 'pgsql';
+                $words = preg_split('/\s+/', $q, -1, PREG_SPLIT_NO_EMPTY);
+
+                $query->where(function ($sub) use ($words, $isPgSql) {
+                    foreach ($words as $word) {
+                        $sub->where(function ($wq) use ($word, $isPgSql) {
+                            if ($isPgSql) {
+                                $wq->whereRaw('similarity(lower(title), ?) > 0.2', [mb_strtolower($word)])
+                                   ->orWhereRaw('similarity(lower(content), ?) > 0.2', [mb_strtolower($word)]);
+                            } else {
+                                $pattern = '%'.$word.'%';
+
+                                $wq->where('title', 'like', $pattern)
+                                   ->orWhere('content', 'like', $pattern);
+                            }
                         });
                     }
-                })
-                ->orderByRaw('
-                    (similarity(lower(title), ?) * 3 + similarity(lower(content), ?)) DESC
-                ', [mb_strtolower($q), mb_strtolower($q)]);
+                });
+
+                if ($isPgSql) {
+                    $query->orderByRaw('
+                        (similarity(lower(title), ?) * 3 + similarity(lower(content), ?)) DESC
+                    ', [mb_strtolower($q), mb_strtolower($q)]);
+                }
             })
             ->with('tags', 'category')
             ->latest()

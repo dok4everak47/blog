@@ -132,7 +132,7 @@ class Note extends Model
         $tagIds = $this->tags()->pluck('tags.id');
 
         if ($tagIds->isEmpty()) {
-            return collect();
+            return new Collection;
         }
 
         return static::published()
